@@ -44,7 +44,8 @@ namespace Badger.Redis.Tests.DataTypes
         {
             var ex = Assert.Throws<ArgumentException>(() => new String(null));
 
-            Assert.Equal("value can't be null\r\nParameter name: value", ex.Message);
+            Assert.StartsWith("value can't be null", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Fact]
