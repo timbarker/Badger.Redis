@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Badger.Redis", "Badger.Redis\Badger.Redis.csproj", "{651C46F5-4B67-43F6-8367-5140EA868151}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Badger.Redis.Tests", "Badger.Redis.Tests\Badger.Redis.Tests.csproj", "{D11FA4FE-C8E1-4879-B39F-36E43E9D2F0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{651C46F5-4B67-43F6-8367-5140EA868151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{651C46F5-4B67-43F6-8367-5140EA868151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{651C46F5-4B67-43F6-8367-5140EA868151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{651C46F5-4B67-43F6-8367-5140EA868151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D11FA4FE-C8E1-4879-B39F-36E43E9D2F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D11FA4FE-C8E1-4879-B39F-36E43E9D2F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D11FA4FE-C8E1-4879-B39F-36E43E9D2F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D11FA4FE-C8E1-4879-B39F-36E43E9D2F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
