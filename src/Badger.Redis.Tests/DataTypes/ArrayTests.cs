@@ -54,6 +54,22 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ArrayIsEqualToItself()
+        {
+            var array = new Array(new Integer(1), new Integer(2), new Integer(3));
+
+            Assert.True(array.Equals(array));
+        }
+
+        [Fact]
+        public void ArrayIsNotEqualToNull()
+        {
+            var array = new Array(new Integer(1), new Integer(2), new Integer(3));
+
+            Assert.False(array.Equals(null));
+        }
+
+        [Fact]
         public void ArraysWithSameContentAreEqual()
         {
             var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
@@ -61,6 +77,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.True(array1.Equals(array2));
             Assert.True(array2.Equals(array1));
+
+            Assert.True(array1 == array2);
+            Assert.True(array2 == array1);
         }
 
         [Fact]
@@ -71,6 +90,9 @@ namespace Badger.Redis.Tests.DataTypes
             
             Assert.False(array1.Equals(array2));
             Assert.False(array2.Equals(array1));
+
+            Assert.True(array1 != array2);
+            Assert.True(array2 != array1);
         }
 
         [Fact]
@@ -81,6 +103,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.False(array1.Equals(array2));
             Assert.False(array2.Equals(array1));
+
+            Assert.True(array1 != array2);
+            Assert.True(array2 != array1);
         }
 
         [Fact]

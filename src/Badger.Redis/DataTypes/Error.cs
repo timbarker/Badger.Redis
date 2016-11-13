@@ -32,8 +32,19 @@ namespace Badger.Redis.DataTypes
 
         public bool Equals(Error other)
         {
-            if (other == null) return false;
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
+        }
+
+        public static bool operator ==(Error lhs, Error rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Error lhs, Error rhs)
+        {
+            return !lhs.Equals(rhs);
         }
     }
 }

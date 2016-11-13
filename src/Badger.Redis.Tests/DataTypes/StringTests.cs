@@ -16,22 +16,6 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
-        public void CanImplicityConvertFromString()
-        {
-            String converted = "test";
-
-            Assert.Equal("test", converted.Value);
-        }
-
-        [Fact]
-        public void CanImplicityConvertToString()
-        {
-            string converted = new String("test");
-
-            Assert.Equal("test", converted);
-        }
-
-        [Fact]
         public void ToStringCorrect()
         {
             var s = new String("test");
@@ -49,6 +33,22 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void StringsAreEqualToItself()
+        {
+            var s = new String("test");
+
+            Assert.True(s.Equals(s));
+        }
+
+        [Fact]
+        public void StringsAreNotEqualToNull()
+        {
+            var s = new String("test");
+
+            Assert.False(s.Equals(null));
+        }
+
+        [Fact]
         public void StringsWithSameContentAreEqual()
         {
             var string1 = new String("test");
@@ -56,6 +56,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.True(string1.Equals(string2));
             Assert.True(string2.Equals(string1));
+
+            Assert.True(string1 == string2);
+            Assert.True(string2 == string1);
         }
 
         [Fact]
@@ -66,6 +69,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.False(string1.Equals(string2));
             Assert.False(string2.Equals(string1));
+
+            Assert.True(string1 != string2);
+            Assert.True(string2 != string1);
         }
 
         [Fact]

@@ -15,9 +15,6 @@ namespace Badger.Redis.DataTypes
             Value = value;
         }
 
-        public static implicit operator string(String s) => s.Value;
-        public static implicit operator String(string s) => new String(s);
-
         public override string ToString()
         {
             return Value;
@@ -35,8 +32,19 @@ namespace Badger.Redis.DataTypes
 
         public bool Equals(String other)
         {
-            if (other == null) return false;
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
+        }
+
+        public static bool operator ==(String lhs, String rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(String lhs, String rhs)
+        {
+            return !lhs.Equals(rhs);
         }
     }
 }

@@ -44,7 +44,6 @@ namespace Badger.Redis.IO
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value));
             }
-            
         }
 
         public async Task WriteAsync(String value, CancellationToken cancellationToken)

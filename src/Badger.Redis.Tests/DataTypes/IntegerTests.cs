@@ -14,27 +14,27 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
-        public void CanImplicityConvertFromLong()
-        {
-            Integer converted = 1234L;
-
-            Assert.Equal(1234L, converted.Value);
-        }
-
-        [Fact]
-        public void CanImplicityConvertToLong()
-        {
-            long converted = new Integer(1234);
-
-            Assert.Equal(1234L, converted);
-        }
-
-        [Fact]
         public void ToStringCorrect()
         {
             var i = new Integer(1234);
 
             Assert.Equal("1234", i.ToString());
+        }
+
+        [Fact]
+        public void IntegersAreEqualToItself()
+        {
+            var i = new Integer(0);
+
+            Assert.True(i.Equals(i));
+        }
+
+        [Fact]
+        public void IntegersAreNotEqualToNull()
+        {
+            var i = new Integer(0);
+
+            Assert.False(i.Equals(null));
         }
 
         [Fact]
@@ -45,6 +45,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.True(integer1.Equals(integer2));
             Assert.True(integer2.Equals(integer1));
+
+            Assert.True(integer1 == integer2);
+            Assert.True(integer2 == integer1);
         }
 
         [Fact]
@@ -55,6 +58,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.False(integer1.Equals(integer2));
             Assert.False(integer2.Equals(integer1));
+
+            Assert.True(integer1 != integer2);
+            Assert.True(integer2 != integer1);
         }
 
         [Fact]

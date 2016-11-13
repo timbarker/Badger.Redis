@@ -63,6 +63,22 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void BulkStringsAreEqualToItself()
+        {
+            var s = BulkString.FromString("test");
+
+            Assert.True(s.Equals(s));
+        }
+
+        [Fact]
+        public void BulkStringsAreNotEqualToNull()
+        {
+            var s = BulkString.FromString("test");
+
+            Assert.False(s.Equals(null));
+        }
+
+        [Fact]
         public void BulkStringsWithSameContentAreEqual()
         {
             var string1 = BulkString.FromString("test");
@@ -70,6 +86,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.True(string1.Equals(string2));
             Assert.True(string2.Equals(string1));
+
+            Assert.True(string1 == string2);
+            Assert.True(string2 == string1);
         }
 
         [Fact]
@@ -80,6 +99,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.False(string1.Equals(string2));
             Assert.False(string2.Equals(string1));
+
+            Assert.True(string1 != string2);
+            Assert.True(string2 != string1);
         }
 
         [Fact]

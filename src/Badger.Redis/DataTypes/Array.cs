@@ -52,11 +52,22 @@ namespace Badger.Redis.DataTypes
 
         public bool Equals(Array other)
         {
-            if (other == null) return false;
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
             if (Value == null && other.Value == null) return true;
             if (Value == null || other.Value == null) return false;
             if (Value.Length != other.Value.Length) return false;
             return Value.SequenceEqual(other.Value);
+        }
+
+        public static bool operator ==(Array lhs, Array rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Array lhs, Array rhs)
+        {
+            return !lhs.Equals(rhs);
         }
     }
 }

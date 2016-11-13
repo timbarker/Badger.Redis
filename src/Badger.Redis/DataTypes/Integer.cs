@@ -12,9 +12,6 @@ namespace Badger.Redis.DataTypes
             Value = value;
         }
 
-        public static implicit operator long(Integer i) => i.Value;
-        public static implicit operator Integer(long i) => new Integer(i);
-
         public override string ToString()
         {
             return Value.ToString();
@@ -31,8 +28,19 @@ namespace Badger.Redis.DataTypes
 
         public bool Equals(Integer other)
         {
-            if (other == null) return false;
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
+        }
+
+        public static bool operator ==(Integer lhs, Integer rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Integer lhs, Integer rhs)
+        {
+            return !lhs.Equals(rhs);
         }
     }
 }

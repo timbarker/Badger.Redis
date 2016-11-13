@@ -32,6 +32,22 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ErrorsAreEqualToItself()
+        {
+            var e = new Error("test");
+
+            Assert.True(e.Equals(e));
+        }
+
+        [Fact]
+        public void ErrorsAreNotEqualToNull()
+        {
+            var e = new Error("test");
+
+            Assert.False(e.Equals(null));
+        }
+
+        [Fact]
         public void ErrorsWithSameContentAreEqual()
         {
             var error1 = new Error("test");
@@ -39,6 +55,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.True(error1.Equals(error2));
             Assert.True(error2.Equals(error1));
+
+            Assert.True(error1 == error2);
+            Assert.True(error2 == error1);
         }
 
         [Fact]
@@ -49,6 +68,9 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.False(error1.Equals(error2));
             Assert.False(error2.Equals(error1));
+
+            Assert.True(error1 != error2);
+            Assert.True(error2 != error1);
         }
 
         [Fact]
