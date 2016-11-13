@@ -36,11 +36,9 @@ namespace Badger.Redis.DataTypes
             return $"[{string.Join(", ", Value.Select(v => v.ToString()))}]";
         }
 
-        public override bool Equals(object obj)
-        {
-            var other = obj as Array;
-            if (other == null) return false;
-            return Equals(other);
+        public override bool Equals(object other)
+        {          
+            return Equals(other as Array);
         }
 
         public override int GetHashCode()
@@ -54,17 +52,11 @@ namespace Badger.Redis.DataTypes
 
         public bool Equals(Array other)
         {
+            if (other == null) return false;
             if (Value == null && other.Value == null) return true;
             if (Value == null || other.Value == null) return false;
             if (Value.Length != other.Value.Length) return false;
-
-            for (int i = 0; i < Value.Length; i++)
-            {
-                if (!Value[i].Equals(other.Value[i]))
-                    return false;
-            }
-
-            return true;
+            return Value.SequenceEqual(other.Value);
         }
     }
 }

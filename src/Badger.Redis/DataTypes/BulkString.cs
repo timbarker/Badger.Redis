@@ -1,48 +1,63 @@
 ﻿using System;
+using System.Linq;
+using System.Text;
 
 namespace Badger.Redis.DataTypes
 {
-    public class BulkString : IDataType<string>, IEquatable<BulkString>
+    public class BulkString : IDataType<byte[]>, IEquatable<BulkString>
     {
+        private const int MaxSize = 512 * 1024 * 1024;
+
         public static BulkString Null = new BulkString();
         public DataType DataType { get; } = DataType.BulkString;
-        public string Value { get; }
+        public byte[] Value { get; }
         public int Length => Value?.Length ?? -1;
 
         private BulkString()
         {
         }
 
-        public BulkString(string value)
+        public BulkString(byte[] value)
         {
             if (value == null) return;
+
+            if (value.Length > MaxSize)
+                throw new ArgumentException($"{nameof(value)} is larger than {MaxSize} bytes", nameof(value));
 
             Value = value;
         }
 
-        public static implicit operator string(BulkString s) => s.Value;
-        public static implicit operator BulkString(string s) => s == null ? Null : new BulkString(s);
+        public static BulkString FromString(string value, Encoding encoding = null)
+        {
+            return new BulkString((encoding ?? Encoding.UTF8).GetBytes(value));
+        }
 
         public override string ToString()
         {
-            return Value == null ? "" : Value;
+            return Value == null ? "" : "0x" + string.Join("", Value.Select(e => e.ToString("x")));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            var other = obj as BulkString;
-            if (other == null) return false;
-            return Equals(other);
+            return Equals(other as BulkString);
         }
 
         public override int GetHashCode()
         {
-            return Value?.GetHashCode() ?? 0;
+            if (Value == null) return 0;
+            unchecked
+            {
+                return Value.Aggregate(17, (hash, element) => hash * 31 + element.GetHashCode());
+            }
         }
 
         public bool Equals(BulkString other)
         {
-            return Value == other.Value;
+            if (other == null) return false;
+            if (Value == null && other.Value == null) return true;
+            if (Value == null || other.Value == null) return false;
+            if (Value.Length != other.Value.Length) return false;
+            return Value.SequenceEqual(other.Value);
         }
     }
 }

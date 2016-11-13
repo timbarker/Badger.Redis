@@ -65,8 +65,9 @@
     <Compile Include="DataTypes\ErrorTests.cs" />
     <Compile Include="DataTypes\BulkStringTests.cs" />
     <Compile Include="DataTypes\StringTests.cs" />
+    <Compile Include="IO\WriterTestExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\SerializerTests.cs" />
+    <Compile Include="IO\WriterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Badger.Redis\Badger.Redis.csproj">

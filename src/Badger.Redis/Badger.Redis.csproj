@@ -48,8 +48,8 @@
     <Compile Include="DataTypes\Integer.cs" />
     <Compile Include="DataTypes\String.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\ISerializer.cs" />
-    <Compile Include="Serialization\Serializer.cs" />
+    <Compile Include="IO\IWriter.cs" />
+    <Compile Include="IO\Writer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
