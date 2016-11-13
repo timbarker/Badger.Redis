@@ -1,5 +1,5 @@
 ﻿using Badger.Redis.DataTypes;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -9,80 +9,94 @@ using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
-    public static class Writer
+    public class Writer : IWriter<IDataType>, IWriter<String>, IWriter<Error>, IWriter<Integer>, IWriter<BulkString>, IWriter<Array>
     {
-        public static IWriter<String> String { get; } = new BasicWriter<String>();
-        public static IWriter<Error> Error { get; } = new BasicWriter<Error>();
-        public static IWriter<Integer> Integer { get; } = new BasicWriter<Integer>();
-        public static IWriter<BulkString> BulkString { get; } = new BulkStringWriter();
-        public static IWriter<Array> Array { get; } = new ArrayWriter();
-
         private const string NewLine = "\r\n";
         private static readonly Encoding DefaultEncoding;
         private static readonly byte[] EncodedNewLine;
+        private readonly Stream _stream;
 
-        static Writer() 
+        static Writer()
         {
             DefaultEncoding = Encoding.ASCII;
             EncodedNewLine = DefaultEncoding.GetBytes(NewLine);
         }
 
-        private class BasicWriter<T> : IWriter<T> where T : IDataType
+        public Writer(Stream stream)
         {
-            public async Task WriteAsync(T value, Stream stream, CancellationToken cancellationToken)
+            _stream = stream;
+        }
+
+        public Task WriteAsync(IDataType value, CancellationToken cancellationToken)
+        {
+            switch (value.DataType)
             {
-                var bytes = DefaultEncoding.GetBytes($"{value.DataType.Prefix}{value}{NewLine}");
-                await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+                case DataType.String:
+                    return WriteAsync(value as String, cancellationToken);
+                case DataType.Error:
+                    return WriteAsync(value as Error, cancellationToken);
+                case DataType.Integer:
+                    return WriteAsync(value as Integer, cancellationToken);
+                case DataType.BulkString:
+                    return WriteAsync(value as BulkString, cancellationToken);
+                case DataType.Array:
+                    return WriteAsync(value as Array, cancellationToken);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value));
+            }
+            
+        }
+
+        public async Task WriteAsync(String value, CancellationToken cancellationToken)
+        {
+            await WriteSimpleAsync(value, cancellationToken);
+        }
+
+        public async Task WriteAsync(Error value, CancellationToken cancellationToken)
+        {
+            await WriteSimpleAsync(value, cancellationToken);
+        }
+
+        public async Task WriteAsync(Integer value, CancellationToken cancellationToken)
+        {
+            await WriteSimpleAsync(value, cancellationToken);
+        }
+
+        private async Task WriteSimpleAsync(IDataType value, CancellationToken cancellationToken)
+        {
+            var bytes = DefaultEncoding.GetBytes($"{value.DataType.Prefix()}{value}{NewLine}");
+            await _stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+        }
+
+        public async Task WriteAsync(BulkString value, CancellationToken cancellationToken)
+        {
+            var header = DefaultEncoding.GetBytes($"{DataType.BulkString.Prefix()}{value.Length}");
+            await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
+            await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
+
+            if (value == DataTypes.BulkString.Null) return;
+
+            await _stream.WriteAsync(value.Value, 0, value.Length, cancellationToken);
+            await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
+        }
+
+        public async Task WriteAsync(Array value,CancellationToken cancellationToken)
+        {
+            var header = DefaultEncoding.GetBytes($"{DataType.Array.Prefix()}{value.Length}");
+            await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
+            await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
+
+            if (value == DataTypes.Array.Null) return;
+
+            foreach (var element in value.Value)
+            {
+                await WriteAsync(element, cancellationToken);
             }
         }
 
-        private class BulkStringWriter : IWriter<BulkString>
+        public void Dispose()
         {
-            public async Task WriteAsync(BulkString value, Stream stream, CancellationToken cancellationToken)
-            {
-                var header = DefaultEncoding.GetBytes($"{DataType.BulkString.Prefix}{value.Length}");
-                await stream.WriteAsync(header, 0, header.Length, cancellationToken);
-                await stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
-
-                if (value == DataTypes.BulkString.Null) return;
-
-                await stream.WriteAsync(value.Value, 0, value.Length, cancellationToken);
-                await stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
-            }
-        }
-
-        private class ArrayWriter : IWriter<Array>
-        {
-            private delegate Task WriteAsyncDelegate(IDataType value, Stream stream, CancellationToken cancellationToken);
-
-            private static readonly IDictionary<DataType, WriteAsyncDelegate> Writers
-                = new Dictionary<DataType, WriteAsyncDelegate>
-            {
-                { DataType.String, (value, stream, token) => String.WriteAsync(value as String, stream, token) },
-                { DataType.Integer, (value, stream, token) => Integer.WriteAsync(value as Integer, stream, token) },
-                { DataType.Error, (value, stream, token) => Error.WriteAsync(value as Error, stream, token) },
-                { DataType.BulkString, (value, stream, token) => BulkString.WriteAsync(value as BulkString, stream, token) },
-                { DataType.Array, (value, stream, token) => Array.WriteAsync(value as Array, stream, token) },
-            };
-
-            private Task WriteAsync(IDataType value, Stream stream, CancellationToken cancellationToken)
-            {
-                return Writers[value.DataType](value, stream, cancellationToken);
-            }
-
-            public async Task WriteAsync(Array value, Stream stream, CancellationToken cancellationToken)
-            {
-                var header = DefaultEncoding.GetBytes($"{DataType.Array.Prefix}{value.Length}");
-                await stream.WriteAsync(header, 0, header.Length, cancellationToken);
-                await stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
-
-                if (value == DataTypes.Array.Null) return;
-
-                foreach (var element in value.Value)
-                {
-                    await WriteAsync(element, stream, cancellationToken);
-                }
-            }
+            _stream.Dispose();
         }
     }
 }

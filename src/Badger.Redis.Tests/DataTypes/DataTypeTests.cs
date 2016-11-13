@@ -8,31 +8,31 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringPrefixTest()
         {
-            Assert.Equal('+', DataType.String.Prefix);
+            Assert.Equal('+', DataType.String.Prefix());
         }
 
         [Fact]
         public void ErrorPrefixTest()
         {
-            Assert.Equal('-', DataType.Error.Prefix);
+            Assert.Equal('-', DataType.Error.Prefix());
         }
 
         [Fact]
         public void IntegerPrefixTest()
         {
-            Assert.Equal(':', DataType.Integer.Prefix);
+            Assert.Equal(':', DataType.Integer.Prefix());
         }
 
         [Fact]
         public void BulkStringPrefixTest()
         {
-            Assert.Equal('$', DataType.BulkString.Prefix);
+            Assert.Equal('$', DataType.BulkString.Prefix());
         }
 
         [Fact]
         public void ArrayPrefixTest()
         {
-            Assert.Equal('*', DataType.Array.Prefix);
+            Assert.Equal('*', DataType.Array.Prefix());
         }
     }
 }
