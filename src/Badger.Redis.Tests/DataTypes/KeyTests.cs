@@ -15,6 +15,14 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ValueIsCorrect()
+        {
+            var k = new Key("test");
+
+            Assert.Equal(new byte[] { 0x74, 0x65, 0x73, 0x74 }, k.Value);
+        }
+
+        [Fact]
         public void ToStringIsCorrect()
         {
             var key = new Key("test");

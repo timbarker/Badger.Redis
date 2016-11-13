@@ -16,6 +16,14 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ValueIsCorrect()
+        {
+            var s = new String("test");
+
+            Assert.Equal("test", s.Value);
+        }
+
+        [Fact]
         public void ToStringCorrect()
         {
             var s = new String("test");

@@ -15,6 +15,14 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ValueIsCorrect()
+        {
+            var s = BulkString.FromString("test");
+
+            Assert.Equal(new byte[] { 0x74, 0x65, 0x73, 0x74 }, s.Value);
+        }
+
+        [Fact]
         public void EmptyBulkStringLengthIs0()
         {
             var s = new BulkString(new byte[0]);

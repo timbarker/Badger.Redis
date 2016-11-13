@@ -15,6 +15,14 @@ namespace Badger.Redis.Tests.DataTypes
         }
 
         [Fact]
+        public void ValueIsCorrect()
+        {
+            var a = new Array(new Integer(1), new Integer(2), new Integer(3));
+
+            Assert.Equal(new IDataType[] { new Integer(1), new Integer(2), new Integer(3) }, a.Value);
+        }
+
+        [Fact]
         public void EmptyArrayLenghtIsZero()
         {
             var a = new Array();
