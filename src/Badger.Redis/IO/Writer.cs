@@ -33,14 +33,19 @@ namespace Badger.Redis.IO
             {
                 case DataType.String:
                     return WriteAsync(value as String, cancellationToken);
+
                 case DataType.Error:
                     return WriteAsync(value as Error, cancellationToken);
+
                 case DataType.Integer:
                     return WriteAsync(value as Integer, cancellationToken);
+
                 case DataType.BulkString:
                     return WriteAsync(value as BulkString, cancellationToken);
+
                 case DataType.Array:
                     return WriteAsync(value as Array, cancellationToken);
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value));
             }
@@ -79,7 +84,7 @@ namespace Badger.Redis.IO
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
         }
 
-        private async Task WriteAsync(Array value,CancellationToken cancellationToken)
+        private async Task WriteAsync(Array value, CancellationToken cancellationToken)
         {
             var header = DefaultEncoding.GetBytes($"{DataType.Array.Prefix()}{value.Length}");
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);

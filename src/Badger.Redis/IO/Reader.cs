@@ -40,17 +40,22 @@ namespace Badger.Redis.IO
             {
                 case DataTypePrefix.String:
                     return new String(value);
+
                 case DataTypePrefix.Error:
                     return new Error(value);
+
                 case DataTypePrefix.Integer:
                     return ReadInteger(value);
+
                 case DataTypePrefix.BulkString:
                     return await ReadBulkStringAsync(value, cancellationToken);
+
                 case DataTypePrefix.Array:
                     return await ReadArrayAsync(value, cancellationToken);
+
                 default:
                     throw new IOException($"Invalid prefix '{prefix}'");
-            }            
+            }
         }
 
         private IDataType ReadInteger(string value)

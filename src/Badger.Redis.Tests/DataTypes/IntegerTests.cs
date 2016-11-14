@@ -12,6 +12,7 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.Equal(DataType.Integer, i.DataType);
         }
+
         [Fact]
         public void ValueIsCorrect()
         {
@@ -19,7 +20,6 @@ namespace Badger.Redis.Tests.DataTypes
 
             Assert.Equal(1234L, i.Value);
         }
-
 
         [Fact]
         public void ToStringCorrect()

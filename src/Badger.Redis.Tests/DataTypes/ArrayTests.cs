@@ -95,7 +95,7 @@ namespace Badger.Redis.Tests.DataTypes
         {
             var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
             var array2 = new Array(new Integer(3), new Integer(2), new Integer(1));
-            
+
             Assert.False(array1.Equals(array2));
             Assert.False(array2.Equals(array1));
 

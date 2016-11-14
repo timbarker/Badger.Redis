@@ -37,7 +37,7 @@ namespace Badger.Redis.DataTypes
         }
 
         public override bool Equals(object other)
-        {          
+        {
             return Equals(other as Array);
         }
 

@@ -15,11 +15,13 @@ namespace Badger.Redis.Tests.IO
     {
         private Writer _writer;
         private MemoryStream _stream;
+
         public WriterTests()
         {
             _stream = new MemoryStream();
             _writer = new Writer(_stream);
         }
+
         public void Dispose()
         {
             _writer.Dispose();

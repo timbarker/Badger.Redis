@@ -178,7 +178,7 @@ namespace Badger.Redis.Tests.IO
 
             Assert.Equal(new Array(
                             new Array(new Integer(1), new Integer(2), new Integer(3)),
-                            new Array(new String("Foo"), new Error("Bar"))), 
+                            new Array(new String("Foo"), new Error("Bar"))),
                          result);
         }
 

@@ -16,6 +16,7 @@ namespace Badger.Redis.DataTypes
         {
             return Value.ToString();
         }
+
         public override bool Equals(object other)
         {
             return Equals(other as Integer);

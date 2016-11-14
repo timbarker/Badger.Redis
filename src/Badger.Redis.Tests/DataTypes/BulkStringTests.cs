@@ -57,7 +57,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ConstructingWith512MBOfDataAllowed()
         {
-            var s =  new BulkString(new byte[512 * 1024 * 1024]);
+            var s = new BulkString(new byte[512 * 1024 * 1024]);
 
             Assert.Equal(536870912, s.Length);
         }
