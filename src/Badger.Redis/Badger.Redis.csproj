@@ -44,6 +44,7 @@
     <Compile Include="DataTypes\BulkString.cs" />
     <Compile Include="DataTypes\DataType.cs" />
     <Compile Include="DataTypes\DataTypeExtensions.cs" />
+    <Compile Include="DataTypes\DataTypePrefix.cs" />
     <Compile Include="DataTypes\Error.cs" />
     <Compile Include="DataTypes\IDataType.cs" />
     <Compile Include="DataTypes\Integer.cs" />

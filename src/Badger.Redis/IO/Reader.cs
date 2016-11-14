@@ -13,13 +13,15 @@ namespace Badger.Redis.IO
     public class Reader : IReader
     {
         private Stream _stream;
-        private List<byte> _buffer;
+        private List<byte> _readBuffer;
         private byte[] _lineBuffer;
+
+        private static readonly Encoding DefaultEncoding = Encoding.ASCII;
 
         public Reader(Stream stream)
         {
             _stream = stream;
-            _buffer = new List<byte>();
+            _readBuffer = new List<byte>();
             _lineBuffer = new byte[1024];
         }
 
@@ -33,17 +35,18 @@ namespace Badger.Redis.IO
             var line = await ReadLineAsync(cancellationToken);
             var prefix = line[0];
             var value = line.Substring(1);
+
             switch (prefix)
             {
-                case '+':
+                case DataTypePrefix.String:
                     return new String(value);
-                case '-':
+                case DataTypePrefix.Error:
                     return new Error(value);
-                case ':':
+                case DataTypePrefix.Integer:
                     return ReadInteger(value);
-                case '$':
+                case DataTypePrefix.BulkString:
                     return await ReadBulkStringAsync(value, cancellationToken);
-                case '*':
+                case DataTypePrefix.Array:
                     return await ReadArrayAsync(value, cancellationToken);
                 default:
                     throw new IOException($"Invalid prefix '{prefix}'");
@@ -55,6 +58,7 @@ namespace Badger.Redis.IO
             long integer;
             if (!long.TryParse(value, out integer))
                 throw new IOException($"Invalid Integer value '{value}'");
+
             return new Integer(integer);
         }
 
@@ -92,32 +96,32 @@ namespace Badger.Redis.IO
         {
             while (true)
             {
-                var read = await _stream.ReadAsync(_lineBuffer, 0, _lineBuffer.Length, cancellationToken);
-
-                _buffer.AddRange(new ArraySegment<byte>(_lineBuffer, 0, read));
-
-                for (int i = 1; i < _buffer.Count; i++)
+                for (int i = 1; i < _readBuffer.Count; i++)
                 {
-                    if (_buffer[i - 1] == '\r' && _buffer[i] == '\n')
+                    if (_readBuffer[i - 1] == '\r' && _readBuffer[i] == '\n')
                     {
-                        var line = Encoding.ASCII.GetString(_buffer.ToArray(), 0, i - 1);
-                        _buffer.RemoveRange(0, i + 1);
+                        var line = DefaultEncoding.GetString(_readBuffer.ToArray(), 0, i - 1);
+                        _readBuffer.RemoveRange(0, i + 1);
                         return line;
                     }
                 }
+
+                var bytesRead = await _stream.ReadAsync(_lineBuffer, 0, _lineBuffer.Length, cancellationToken);
+
+                _readBuffer.AddRange(new ArraySegment<byte>(_lineBuffer, 0, bytesRead));
             }
         }
 
         private async Task<byte[]> ReadBytesAsync(int count, CancellationToken cancellationToken)
         {
             var readBuffer = new byte[count];
-            int read = Math.Min(count, _buffer.Count);
-            _buffer.CopyTo(0, readBuffer, 0, read);
-            _buffer.RemoveRange(0, read);
+            int bytesRead = Math.Min(count, _readBuffer.Count);
+            _readBuffer.CopyTo(0, readBuffer, 0, bytesRead);
+            _readBuffer.RemoveRange(0, bytesRead);
 
-            while (read < count)
+            while (bytesRead < count)
             {
-                read += await _stream.ReadAsync(readBuffer, read, count - read, cancellationToken);
+                bytesRead += await _stream.ReadAsync(readBuffer, bytesRead, count - bytesRead, cancellationToken);
             }
 
             return readBuffer;

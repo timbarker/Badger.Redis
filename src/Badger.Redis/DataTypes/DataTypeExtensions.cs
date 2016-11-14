@@ -9,15 +9,15 @@ namespace Badger.Redis.DataTypes
             switch (dataType)
             {
                 case DataType.String:
-                    return '+';
+                    return DataTypePrefix.String;
                 case DataType.Error:
-                    return '-';
+                    return DataTypePrefix.Error;
                 case DataType.Integer:
-                    return ':';
+                    return DataTypePrefix.Integer;
                 case DataType.BulkString:
-                    return '$';
+                    return DataTypePrefix.BulkString;
                 case DataType.Array:
-                    return '*';
+                    return DataTypePrefix.Array;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataType));
             }

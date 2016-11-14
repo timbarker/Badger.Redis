@@ -9,7 +9,7 @@ using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
-    public class Writer : IWriter<IDataType>, IWriter<String>, IWriter<Error>, IWriter<Integer>, IWriter<BulkString>, IWriter<Array>
+    public class Writer : IWriter
     {
         private const string NewLine = "\r\n";
         private static readonly Encoding DefaultEncoding;
@@ -46,17 +46,17 @@ namespace Badger.Redis.IO
             }
         }
 
-        public async Task WriteAsync(String value, CancellationToken cancellationToken)
+        private async Task WriteAsync(String value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
 
-        public async Task WriteAsync(Error value, CancellationToken cancellationToken)
+        private async Task WriteAsync(Error value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
 
-        public async Task WriteAsync(Integer value, CancellationToken cancellationToken)
+        private async Task WriteAsync(Integer value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
@@ -67,7 +67,7 @@ namespace Badger.Redis.IO
             await _stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
         }
 
-        public async Task WriteAsync(BulkString value, CancellationToken cancellationToken)
+        private async Task WriteAsync(BulkString value, CancellationToken cancellationToken)
         {
             var header = DefaultEncoding.GetBytes($"{DataType.BulkString.Prefix()}{value.Length}");
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
@@ -79,7 +79,7 @@ namespace Badger.Redis.IO
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
         }
 
-        public async Task WriteAsync(Array value,CancellationToken cancellationToken)
+        private async Task WriteAsync(Array value,CancellationToken cancellationToken)
         {
             var header = DefaultEncoding.GetBytes($"{DataType.Array.Prefix()}{value.Length}");
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
