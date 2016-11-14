@@ -66,6 +66,7 @@
     <Compile Include="DataTypes\BulkStringTests.cs" />
     <Compile Include="DataTypes\KeyTests.cs" />
     <Compile Include="DataTypes\StringTests.cs" />
+    <Compile Include="IO\ReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\WriterTests.cs" />
   </ItemGroup>
