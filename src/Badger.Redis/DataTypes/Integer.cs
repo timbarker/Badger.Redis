@@ -17,9 +17,9 @@ namespace Badger.Redis.DataTypes
             return Value.ToString();
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return Equals(other as Integer);
+            return Equals(obj as Integer);
         }
 
         public override int GetHashCode()

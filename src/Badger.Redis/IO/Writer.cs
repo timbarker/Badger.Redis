@@ -78,7 +78,7 @@ namespace Badger.Redis.IO
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
 
-            if (value == DataTypes.BulkString.Null) return;
+            if (value == BulkString.Null) return;
 
             await _stream.WriteAsync(value.Value, 0, value.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
@@ -90,7 +90,7 @@ namespace Badger.Redis.IO
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
 
-            if (value == DataTypes.Array.Null) return;
+            if (value == Array.Null) return;
 
             foreach (var element in value.Value)
             {

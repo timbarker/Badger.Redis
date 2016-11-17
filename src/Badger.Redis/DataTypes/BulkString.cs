@@ -37,9 +37,9 @@ namespace Badger.Redis.DataTypes
             return Value == null ? "" : "0x" + string.Join("", Value.Select(e => e.ToString("x")));
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return Equals(other as BulkString);
+            return Equals(obj as BulkString);
         }
 
         public override int GetHashCode()

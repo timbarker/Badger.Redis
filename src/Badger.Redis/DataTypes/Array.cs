@@ -27,7 +27,7 @@ namespace Badger.Redis.DataTypes
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         public override string ToString()
@@ -36,9 +36,9 @@ namespace Badger.Redis.DataTypes
             return $"[{string.Join(", ", Value.Select(v => v.ToString()))}]";
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return Equals(other as Array);
+            return Equals(obj as Array);
         }
 
         public override int GetHashCode()
