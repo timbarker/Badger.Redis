@@ -3,15 +3,12 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-using System.Collections.Generic;
-
+using System.Collections.Concurrent;
 
 namespace Badger.Redis
 {
-
-    public class ConnectionPool : IDisposable
+    public class ConnectionPool : IConnectionPool
     {
-
         private class PooledConnection : IConnection
         {
             private ConnectionPool _pool;
@@ -27,70 +24,104 @@ namespace Badger.Redis
             public Task<string> PingAsync(CancellationToken cancellationToken)
             {
                 if (disposed)
-                    throw new ObjectDisposedException("Connection");
+                    throw new ObjectDisposedException(nameof(IConnection));
                 
                 return _connection.PingAsync(cancellationToken);
             }
 
             public void Dispose()
             {
-                disposed = false;
-                _pool.ReturnToPool(_connection);
+                if (disposed) return;
+
+                disposed = true;
+                _pool.Return(_connection);
             }
         }
 
-        private ISocketFactory _socketFactory;
-        private Configuration _configuration;
-        private Queue<Connection> _availableConnections;
-        private List<Connection> _activeConnections;
+        private readonly ISocketFactory _socketFactory;
+        private readonly Configuration _configuration;
+        private readonly ConcurrentQueue<Connection> _availableConnections;
+        private int _activeConnections;
+        private bool _disposed;
 
         public ConnectionPool(Configuration configuration)
         {
             _configuration = configuration;
             _socketFactory = new SocketFactory();
-            _availableConnections = new Queue<Connection>(configuration.MaxPoolSize);
-            _activeConnections = new List<Connection>();
+            _availableConnections = new ConcurrentQueue<Connection>();
         }
 
-        public async Task<IConnection> ConnectAsync(CancellationToken cancellationToken)
+        public async Task<IConnection> GetConnectionAsync(CancellationToken cancellationToken)
         {
-            Connection conn = null;
-            if (_availableConnections.Count > 0)
-            {
-                conn = _availableConnections.Dequeue();
-                await conn.PingAsync(cancellationToken);
-                // todo what to do if ping fails?
-            }
-            else if (_activeConnections.Count < _configuration.MaxPoolSize)
-            {
-                conn = new Connection(IPAddress.Parse(_configuration.Address), _configuration.Port, _socketFactory);
-
-                await conn.ConnectAsync(cancellationToken);
-            }
-            else
-            {
-                throw new Exception("ConnectionPool size exceeded");
-            }
-
-            _activeConnections.Add(conn);
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(ConnectionPool));
+            
+            var conn = await GetOrCreateConnectionAsync(cancellationToken);
 
             return conn;
         }
 
-        private void ReturnToPool(Connection conn)
+        private async Task<Connection> GetOrCreateConnectionAsync(CancellationToken cancellationToken)
         {
-            _activeConnections.Remove(conn);
+            var conn = await GetPooledConnectionAsync(cancellationToken);
+            if (conn != null) return conn;
+
+            if (Interlocked.Increment(ref _activeConnections) <= _configuration.MaxPoolSize)
+            {
+                try
+                {
+                    conn = new Connection(IPAddress.Parse(_configuration.Address), _configuration.Port, _socketFactory);
+                    await conn.ConnectAsync(cancellationToken);
+                    return conn;
+                }
+                catch (Exception)
+                {
+                    Interlocked.Decrement(ref _activeConnections);
+                    throw;
+                }
+            }
+
+            throw new Exception($"ConnectionPool size exceeded - MaxPoolSize: {_configuration.MaxPoolSize}");
+        }
+
+        private async Task<Connection> GetPooledConnectionAsync(CancellationToken cancellationToken)
+        {
+            Connection conn = null;
+            while (_availableConnections.TryDequeue(out conn))
+            {
+                try
+                {
+                    await conn.PingAsync(cancellationToken);
+                    return conn;
+                }
+                catch (Exception)
+                {
+                    conn.Dispose();
+                }
+            }
+
+            return null;
+        }
+
+        private void Return(Connection conn)
+        {
+            if (_disposed)
+            {
+                conn.Dispose();
+                return;
+            }
+
             _availableConnections.Enqueue(conn);
+
+            Interlocked.Decrement(ref _activeConnections);
         }
 
         public void Dispose()
         {
-            foreach (var conn in _availableConnections)
-            {
-                conn.Dispose();
-            }
+            _disposed = true;
 
-            foreach (var conn in _activeConnections)
+            Connection conn;
+            while (_availableConnections.TryDequeue(out conn))
             {
                 conn.Dispose();
             }

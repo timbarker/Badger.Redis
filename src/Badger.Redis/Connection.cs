@@ -46,9 +46,9 @@ namespace Badger.Redis
 
             _state = new Connected { Socket = socket, EndPoint = state.EndPoint };
 
-            var pong = await PingAsync(cancellationToken);
-            if (pong != Responses.PONG)
-                throw new Exception($"Invalid PING response - expected '{Responses.PONG}' but got '{pong}'");
+            var response = await PingAsync(cancellationToken);
+            if (response != Response.PONG)
+                throw new Exception($"Invalid PING response - expected '{Response.PONG}' but got '{response}'");
         }
 
         private async Task<T> SendAsync<T>(IDataType request, CancellationToken cancellationToken) where T : IDataType
@@ -66,7 +66,7 @@ namespace Badger.Redis
         {
             GetState<Connected>();
 
-            var response = await SendAsync<String>(new CommandBuilder().WithCommand(Commands.PING).Build(), cancellationToken);
+            var response = await SendAsync<String>(new CommandBuilder().WithCommand(Command.PING).Build(), cancellationToken);
 
             return response.Value;
 
@@ -76,7 +76,7 @@ namespace Badger.Redis
         {
             var state = GetState<Connected>();
 
-            await SendAsync<String>(new CommandBuilder().WithCommand(Commands.QUIT).Build(), cancellationToken);
+            await SendAsync<String>(new CommandBuilder().WithCommand(Command.QUIT).Build(), cancellationToken);
             state.Socket.Close();
 
             _state = new Disconnected { EndPoint = state.EndPoint };
