@@ -1,12 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using System;
 
 namespace Badger.Redis
 {
-    public interface IConnection
+    public interface IConnection : IDisposable
     {
-        Task ConnectAsync(CancellationToken cancellationToken);
-
-        Task DisconnectAsync(CancellationToken cancellationToken);
+        Task<string> PingAsync(CancellationToken token);
     }
 }

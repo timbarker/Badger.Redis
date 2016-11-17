@@ -2,7 +2,8 @@
 {
     public class Configuration
     {
-        public string Address { get; set; }
-        public int Port { get; set; }
+        public string Address { get; set; } = "localhost";
+        public int Port { get; set; } = 6379;
+        public int MaxPoolSize { get; set; } = 10;
     }
 }

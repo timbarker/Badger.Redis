@@ -44,7 +44,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Connection.cs" />
-    <Compile Include="ConnectionFactory.cs" />
+    <Compile Include="ConnectionPool.cs" />
     <Compile Include="DataTypes\Array.cs" />
     <Compile Include="DataTypes\BulkString.cs" />
     <Compile Include="DataTypes\DataType.cs" />

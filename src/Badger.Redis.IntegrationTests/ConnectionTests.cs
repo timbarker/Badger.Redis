@@ -11,13 +11,12 @@ namespace Badger.Redis.IntegrationTests
         [Fact]
         public async Task CanConnectAndDisconnect()
         {
-            var connectionFactory = new ConnectionFactory(Config);
+            var pool = new ConnectionPool(Config);
 
-            var connection = connectionFactory.Create();
-
-            await connection.ConnectAsync(CancellationToken.None);
-
-            await connection.DisconnectAsync(CancellationToken.None);
+            using (var connection = await pool.CreateAsync(CancellationToken.None))
+            {
+                await connection.PingAsync(CancellationToken.None);
+            }
         }
     }
 }
