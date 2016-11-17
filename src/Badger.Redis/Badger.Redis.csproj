@@ -40,6 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandBuilder.cs" />
+    <Compile Include="Commands.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="ConnectionFactory.cs" />
     <Compile Include="DataTypes\Array.cs" />
     <Compile Include="DataTypes\BulkString.cs" />
     <Compile Include="DataTypes\DataType.cs" />
@@ -50,9 +55,13 @@
     <Compile Include="DataTypes\Integer.cs" />
     <Compile Include="DataTypes\Key.cs" />
     <Compile Include="DataTypes\String.cs" />
-    <Compile Include="IO\Connection.cs" />
+    <Compile Include="IConnection.cs" />
+    <Compile Include="IO\ISocket.cs" />
+    <Compile Include="IO\ISocketFactory.cs" />
+    <Compile Include="IO\Socket.cs" />
     <Compile Include="IO\IReader.cs" />
     <Compile Include="IO\Reader.cs" />
+    <Compile Include="IO\SocketFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\IWriter.cs" />
     <Compile Include="IO\Writer.cs" />
