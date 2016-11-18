@@ -69,7 +69,6 @@ namespace Badger.Redis
             var response = await SendAsync<String>(new CommandBuilder().WithCommand(Command.PING).Build(), cancellationToken);
 
             return response.Value;
-
         }
 
         public async Task DisconnectAsync(CancellationToken cancellationToken)

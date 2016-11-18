@@ -1,9 +1,9 @@
 ﻿using Badger.Redis.IO;
-using System.Net;
-using System.Threading.Tasks;
-using System.Threading;
 using System;
 using System.Collections.Concurrent;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Badger.Redis
 {
@@ -25,7 +25,7 @@ namespace Badger.Redis
             {
                 if (disposed)
                     throw new ObjectDisposedException(nameof(IConnection));
-                
+
                 return _connection.PingAsync(cancellationToken);
             }
 
@@ -55,10 +55,22 @@ namespace Badger.Redis
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(ConnectionPool));
-            
-            var conn = await GetOrCreateConnectionAsync(cancellationToken);
 
-            return conn;
+            if (Interlocked.Increment(ref _activeConnections) > _configuration.MaxPoolSize)
+            {
+                Interlocked.Decrement(ref _activeConnections);
+                throw new Exception($"Connection Pool size exceeded - MaxPoolSize: {_configuration.MaxPoolSize}");
+            }
+
+            try
+            {
+                return await GetOrCreateConnectionAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                Interlocked.Decrement(ref _activeConnections);
+                throw;
+            }
         }
 
         private async Task<Connection> GetOrCreateConnectionAsync(CancellationToken cancellationToken)
@@ -66,22 +78,9 @@ namespace Badger.Redis
             var conn = await GetPooledConnectionAsync(cancellationToken);
             if (conn != null) return conn;
 
-            if (Interlocked.Increment(ref _activeConnections) <= _configuration.MaxPoolSize)
-            {
-                try
-                {
-                    conn = new Connection(IPAddress.Parse(_configuration.Address), _configuration.Port, _socketFactory);
-                    await conn.ConnectAsync(cancellationToken);
-                    return conn;
-                }
-                catch (Exception)
-                {
-                    Interlocked.Decrement(ref _activeConnections);
-                    throw;
-                }
-            }
-
-            throw new Exception($"ConnectionPool size exceeded - MaxPoolSize: {_configuration.MaxPoolSize}");
+            conn = new Connection(IPAddress.Parse(_configuration.Address), _configuration.Port, _socketFactory);
+            await conn.ConnectAsync(cancellationToken);
+            return conn;
         }
 
         private async Task<Connection> GetPooledConnectionAsync(CancellationToken cancellationToken)
@@ -112,7 +111,6 @@ namespace Badger.Redis
             }
 
             _availableConnections.Enqueue(conn);
-
             Interlocked.Decrement(ref _activeConnections);
         }
 
