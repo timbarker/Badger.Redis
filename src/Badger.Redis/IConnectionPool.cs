@@ -13,5 +13,7 @@ namespace Badger.Redis
     public interface IConnectionPool : IDisposable
     {
         Task<IConnection> GetConnectionAsync(CancellationToken cancellationToken);
+
+        Task<IConnection> GetConnectionAsync();
     }
 }

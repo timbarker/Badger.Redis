@@ -51,6 +51,11 @@ namespace Badger.Redis
             _availableConnections = new ConcurrentQueue<Connection>();
         }
 
+        public Task<IConnection> GetConnectionAsync()
+        {
+            return GetConnectionAsync(CancellationToken.None);
+        }
+
         public async Task<IConnection> GetConnectionAsync(CancellationToken cancellationToken)
         {
             if (_disposed)

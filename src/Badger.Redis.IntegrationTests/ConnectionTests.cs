@@ -12,7 +12,7 @@ namespace Badger.Redis.IntegrationTests
         public async Task CanConnectAndDisconnect()
         {
             using (var pool = new ConnectionPool(Config))
-            using (var connection = await pool.GetConnectionAsync(CancellationToken.None))
+            using (var connection = await pool.GetConnectionAsync())
             {
                 await connection.PingAsync(CancellationToken.None);
             }
