@@ -45,7 +45,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConnectionPoolException.cs" />
     <Compile Include="Connection\BasicConnectionFactory.cs" />
-    <Compile Include="Connection\Connection.cs" />
+    <Compile Include="Connection\BasicConnection.cs" />
     <Compile Include="Connection\ConnectionOpener.cs" />
     <Compile Include="ConnectionPool.cs" />
     <Compile Include="Connection\ConnectionException.cs" />
