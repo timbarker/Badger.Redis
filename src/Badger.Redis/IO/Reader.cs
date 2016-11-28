@@ -10,7 +10,7 @@ using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
-    public class Reader : IReader
+    internal class Reader : IReader
     {
         private Stream _stream;
         private List<byte> _readBuffer;

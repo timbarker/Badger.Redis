@@ -48,7 +48,7 @@ namespace Badger.Redis
         private bool _disposed;
 
         public ConnectionPool(Configuration configuration)
-            : this(configuration, new ConnectionCreator(new BasicConnectionFactory(new SocketFactory())))
+            : this(configuration, new ConnectionCreator(new BasicConnectionFactory(new ClientFactory())))
         {
         }
 

@@ -9,7 +9,7 @@ using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
-    public class Writer : IWriter
+    internal class Writer : IWriter
     {
         private const string NewLine = "\r\n";
         private static readonly Encoding DefaultEncoding;

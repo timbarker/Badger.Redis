@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Badger.Redis.IO
 {
-    public interface IWriter : IDisposable
+    internal interface IWriter : IDisposable
     {
         Task WriteAsync(IDataType value, CancellationToken cancellationToken);
     }

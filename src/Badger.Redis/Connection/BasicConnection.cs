@@ -10,7 +10,7 @@ namespace Badger.Redis.Connection
 {
     internal class BasicConnection : IOpenableConnection
     {
-        private ISocketFactory _socketFactory;
+        private IClientFactory _clientFactory;
 
         private interface IState<TState>
         {
@@ -25,7 +25,7 @@ namespace Badger.Redis.Connection
 
         private class Connected : IState<ConnectionState>
         {
-            public ISocket Socket { get; set; }
+            public IClient Client { get; set; }
             public ConnectionState State => ConnectionState.Connected;
         }
 
@@ -37,19 +37,18 @@ namespace Badger.Redis.Connection
         private IState<ConnectionState> _state;
         public ConnectionState State => _state.State;
 
-        public BasicConnection(IPEndPoint endPoint, ISocketFactory socketFactory)
+        public BasicConnection(IPEndPoint endPoint, IClientFactory clientFactory)
         {
             _state = new Disconnected { EndPoint = endPoint };
-            _socketFactory = socketFactory;
+            _clientFactory = clientFactory;
         }
 
         public async Task OpenAsync(CancellationToken cancellationToken)
         {
             var state = GetState<Disconnected>();
 
-            var socket = _socketFactory.Create(state.EndPoint);
-            await socket.OpenAsync();
-            _state = new Connected { Socket = socket };
+            var socket = await _clientFactory.CreateConnectedAsync(state.EndPoint);
+            _state = new Connected { Client = socket };
 
             await PingAsync(cancellationToken);
         }
@@ -58,7 +57,7 @@ namespace Badger.Redis.Connection
         {
             var state = GetState<Connected>();
 
-            var response = await state.Socket.SendAsync(request, cancellationToken);
+            var response = await state.Client.SendAsync(request, cancellationToken);
             if (response is T)
                 return (T)response;
 
@@ -80,7 +79,7 @@ namespace Badger.Redis.Connection
             var state = GetState<Connected>();
 
             await SendAsync<String>(new CommandBuilder().WithCommand(Command.QUIT).Build(), cancellationToken);
-            state.Socket.Close();
+            state.Client.Dispose();
             _state = new Closed();
         }
 
@@ -99,7 +98,7 @@ namespace Badger.Redis.Connection
                 return;
 
             var state = GetState<Connected>();
-            state.Socket.Close();
+            state.Client.Dispose();
             _state = new Closed();
         }
     }
