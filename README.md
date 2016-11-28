@@ -19,10 +19,10 @@
 5. Dispose the connection pool on application shutdown
 
 ```cs
-var config = new Configuration { Address = "127.0.0.1", Port = 6379 };
+var config = new Configuration { Host = "127.0.0.1", Port = 6379 };
 
 using (var pool = new ConnectionPool(config))
-using (var connection = await pool.GetConnectionAsync(CancellationToken.None))
+using (var connection = await pool.GetConnectionAsync())
 {
     await connection.PingAsync(CancellationToken.None);
 }
