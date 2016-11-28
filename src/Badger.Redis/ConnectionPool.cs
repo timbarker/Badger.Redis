@@ -1,7 +1,7 @@
-﻿using Badger.Redis.IO;
+﻿using Badger.Redis.Connection;
+using Badger.Redis.IO;
 using System;
 using System.Collections.Concurrent;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,22 +11,25 @@ namespace Badger.Redis
     {
         private class PooledConnection : IConnection
         {
-            private ConnectionPool _pool;
-            private Connection _connection;
+            private readonly ConnectionPool _pool;
+            private readonly IConnection _connection;
             private bool disposed;
 
-            public PooledConnection(Connection connection, ConnectionPool pool)
+            public PooledConnection(IConnection connection, ConnectionPool pool)
             {
                 _connection = connection;
                 _pool = pool;
             }
 
-            public Task<string> PingAsync(CancellationToken cancellationToken)
-            {
-                if (disposed)
-                    throw new ObjectDisposedException(nameof(IConnection));
+            public ConnectionState State => ExecIfNotDisposed(c => c.State);
 
-                return _connection.PingAsync(cancellationToken);
+            public Task<string> PingAsync(CancellationToken cancellationToken) => ExecIfNotDisposed(c => c.PingAsync(cancellationToken));
+
+            private T ExecIfNotDisposed<T>(Func<IConnection, T> func)
+            {
+                if (disposed) throw new ObjectDisposedException(nameof(IConnection));
+
+                return func(_connection);
             }
 
             public void Dispose()
@@ -38,18 +41,25 @@ namespace Badger.Redis
             }
         }
 
-        private readonly ISocketFactory _socketFactory;
         private readonly Configuration _configuration;
-        private readonly ConcurrentQueue<Connection> _availableConnections;
+        private readonly IConnectionOpener _connectionOpener;
+        private readonly ConcurrentQueue<IConnection> _availableConnections;
         private int _activeConnections;
         private bool _disposed;
 
         public ConnectionPool(Configuration configuration)
+            : this(configuration, new ConnectionOpener(new BasicConnectionFactory(new SocketFactory())))
         {
-            _configuration = configuration;
-            _socketFactory = new SocketFactory();
-            _availableConnections = new ConcurrentQueue<Connection>();
         }
+
+        internal ConnectionPool(Configuration configuration, IConnectionOpener connectionOpener)
+        {
+            _connectionOpener = connectionOpener;
+            _configuration = configuration;
+            _availableConnections = new ConcurrentQueue<IConnection>();
+        }
+
+        public int ActiveConnections => _activeConnections;
 
         public Task<IConnection> GetConnectionAsync()
         {
@@ -64,12 +74,12 @@ namespace Badger.Redis
             if (Interlocked.Increment(ref _activeConnections) > _configuration.MaxPoolSize)
             {
                 Interlocked.Decrement(ref _activeConnections);
-                throw new Exception($"Connection Pool size exceeded - MaxPoolSize: {_configuration.MaxPoolSize}");
+                throw new ConnectionPoolException($"Connection Pool size exceeded - MaxPoolSize: {_configuration.MaxPoolSize}");
             }
 
             try
             {
-                return await GetOrCreateConnectionAsync(cancellationToken);
+                return new PooledConnection(await GetPooledOrOpenConnectionAsync(cancellationToken), this);
             }
             catch (Exception)
             {
@@ -78,19 +88,17 @@ namespace Badger.Redis
             }
         }
 
-        private async Task<Connection> GetOrCreateConnectionAsync(CancellationToken cancellationToken)
+        private async Task<IConnection> GetPooledOrOpenConnectionAsync(CancellationToken cancellationToken)
         {
             var conn = await GetPooledConnectionAsync(cancellationToken);
             if (conn != null) return conn;
 
-            conn = new Connection(IPAddress.Parse(_configuration.Address), _configuration.Port, _socketFactory);
-            await conn.ConnectAsync(cancellationToken);
-            return conn;
+            return await _connectionOpener.OpenAsync(_configuration.Host, _configuration.Port, cancellationToken);
         }
 
-        private async Task<Connection> GetPooledConnectionAsync(CancellationToken cancellationToken)
+        private async Task<IConnection> GetPooledConnectionAsync(CancellationToken cancellationToken)
         {
-            Connection conn = null;
+            IConnection conn = null;
             while (_availableConnections.TryDequeue(out conn))
             {
                 try
@@ -107,7 +115,7 @@ namespace Badger.Redis
             return null;
         }
 
-        private void Return(Connection conn)
+        private void Return(IConnection conn)
         {
             if (_disposed)
             {
@@ -123,7 +131,7 @@ namespace Badger.Redis
         {
             _disposed = true;
 
-            Connection conn;
+            IConnection conn;
             while (_availableConnections.TryDequeue(out conn))
             {
                 conn.Dispose();

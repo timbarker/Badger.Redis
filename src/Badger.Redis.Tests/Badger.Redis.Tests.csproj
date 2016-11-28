@@ -67,7 +67,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionTests.cs" />
+    <Compile Include="Connection\ConnectionOpenerTests.cs" />
+    <Compile Include="ConnectionPoolTests.cs" />
+    <Compile Include="Connection\BasicConnectionTests.cs" />
     <Compile Include="DataTypes\ArrayTests.cs" />
     <Compile Include="DataTypes\DataTypeTests.cs" />
     <Compile Include="DataTypes\IntegerTests.cs" />

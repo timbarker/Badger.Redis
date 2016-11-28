@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Badger.Redis
+namespace Badger.Redis.Connection
 {
     /// <summary>
     /// Represents a connection to a Redis server.
@@ -13,5 +13,7 @@ namespace Badger.Redis
     public interface IConnection : IDisposable
     {
         Task<string> PingAsync(CancellationToken token);
+
+        ConnectionState State { get; }
     }
 }

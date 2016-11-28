@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Badger.Redis.Connection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace Badger.Redis
     /// </remarks>
     public interface IConnectionPool : IDisposable
     {
+        int ActiveConnections { get; }
+
         Task<IConnection> GetConnectionAsync(CancellationToken cancellationToken);
 
         Task<IConnection> GetConnectionAsync();

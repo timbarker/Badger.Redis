@@ -1,4 +1,5 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Connection;
+using Badger.Redis.DataTypes;
 using Badger.Redis.IO;
 using Moq;
 using System.Linq;
@@ -10,9 +11,9 @@ using Xunit;
 using Array = Badger.Redis.DataTypes.Array;
 using String = Badger.Redis.DataTypes.String;
 
-namespace Badger.Redis.Tests
+namespace Badger.Redis.Tests.Connection
 {
-    public class ConnectionTests
+    public class BasicConnectionTests
     {
         public class GivenAConnectionWhenConnecting
         {
@@ -26,9 +27,9 @@ namespace Badger.Redis.Tests
                 _socket.SetReturnsDefault(Task.FromResult<IDataType>(new String("PONG")));
                 _socketFactory.SetReturnsDefault(_socket.Object);
 
-                var connection = new Connection(IPAddress.Loopback, 6379, _socketFactory.Object);
+                var connection = new BasicConnection(IPAddress.Loopback, 6379, _socketFactory.Object);
 
-                connection.ConnectAsync(CancellationToken.None).Wait();
+                connection.OpenAsync(CancellationToken.None).Wait();
             }
 
             [Fact]
@@ -68,9 +69,9 @@ namespace Badger.Redis.Tests
 
                 _socketFactory.SetReturnsDefault(_socket.Object);
 
-                var connection = new Connection(IPAddress.Loopback, 6379, _socketFactory.Object);
+                var connection = new BasicConnection(IPAddress.Loopback, 6379, _socketFactory.Object);
 
-                connection.ConnectAsync(CancellationToken.None).Wait();
+                connection.OpenAsync(CancellationToken.None).Wait();
 
                 _socket.ResetCalls();
 

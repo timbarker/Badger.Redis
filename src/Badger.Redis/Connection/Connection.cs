@@ -6,49 +6,59 @@ using System.Threading;
 using System.Threading.Tasks;
 using String = Badger.Redis.DataTypes.String;
 
-namespace Badger.Redis
+namespace Badger.Redis.Connection
 {
-    public class Connection : IConnection
+    internal class BasicConnection : IOpenableConnection
     {
         private ISocketFactory _socketFactory;
 
-        private interface IState
-        { }
-
-        private class Disconnected : IState
+        private interface IState<TState>
         {
-            public IPEndPoint EndPoint { get; set; }
+            TState State { get; }
         }
 
-        private class Connected : IState
+        private class Disconnected : IState<ConnectionState>
+        {
+            public IPEndPoint EndPoint { get; set; }
+            public ConnectionState State => ConnectionState.Disconnected;
+        }
+
+        private class Connected : IState<ConnectionState>
         {
             public ISocket Socket { get; set; }
-            public IPEndPoint EndPoint { get; set; }
+            public ConnectionState State => ConnectionState.Connected;
         }
 
-        private class Closed : IState
-        { }
+        private class Closed : IState<ConnectionState>
+        {
+            public ConnectionState State => ConnectionState.Closed;
+        }
 
-        private IState _state;
+        private IState<ConnectionState> _state;
+        public ConnectionState State => _state.State;
 
-        public Connection(IPAddress address, int port, ISocketFactory socketFactory)
+        public BasicConnection(IPAddress address, int port, ISocketFactory socketFactory)
         {
             _state = new Disconnected { EndPoint = new IPEndPoint(address, port) };
             _socketFactory = socketFactory;
         }
 
-        public async Task ConnectAsync(CancellationToken cancellationToken)
+        public async Task OpenAsync(CancellationToken cancellationToken)
         {
             var state = GetState<Disconnected>();
 
-            var socket = _socketFactory.Create(state.EndPoint);
-            await socket.OpenAsync();
+            try
+            {
+                var socket = _socketFactory.Create(state.EndPoint);
+                await socket.OpenAsync();
+                _state = new Connected { Socket = socket };
+            }
+            catch (Exception ex)
+            {
+                throw new ConnectionException($"Unable to connect to Redis server at {state.EndPoint.Address}:{state.EndPoint.Port}", ex);
+            }
 
-            _state = new Connected { Socket = socket, EndPoint = state.EndPoint };
-
-            var response = await PingAsync(cancellationToken);
-            if (response != Response.PONG)
-                throw new Exception($"Invalid PING response - expected '{Response.PONG}' but got '{response}'");
+            await PingAsync(cancellationToken);
         }
 
         private async Task<T> SendAsync<T>(IDataType request, CancellationToken cancellationToken) where T : IDataType
@@ -59,7 +69,7 @@ namespace Badger.Redis
             if (response is T)
                 return (T)response;
 
-            throw new Exception($"Invalid Response type - expected '{typeof(T).Name}' but got '{response.GetType().Name}'");
+            throw new ConnectionException($"Invalid Response type - expected '{typeof(T).Name}' but got '{response.GetType().Name}'");
         }
 
         public async Task<string> PingAsync(CancellationToken cancellationToken)
@@ -67,7 +77,8 @@ namespace Badger.Redis
             GetState<Connected>();
 
             var response = await SendAsync<String>(new CommandBuilder().WithCommand(Command.PING).Build(), cancellationToken);
-
+            if (response.Value != Response.PONG)
+                throw new ConnectionException($"Invalid PING response - expected '{Response.PONG}' but got '{response}'");
             return response.Value;
         }
 
@@ -77,15 +88,14 @@ namespace Badger.Redis
 
             await SendAsync<String>(new CommandBuilder().WithCommand(Command.QUIT).Build(), cancellationToken);
             state.Socket.Close();
-
-            _state = new Disconnected { EndPoint = state.EndPoint };
+            _state = new Closed();
         }
 
-        private T GetState<T>() where T : class, IState
+        private T GetState<T>() where T : class, IState<ConnectionState>
         {
             var state = _state as T;
             if (state == null)
-                throw new InvalidOperationException($"Invalid Connection State - Required '{typeof(T).Name}' but was '{_state.GetType().Name}'");
+                throw new ConnectionException($"Invalid Connection State - Required '{typeof(T).Name}' but was '{_state.GetType().Name}'");
 
             return state;
         }
