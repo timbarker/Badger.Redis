@@ -7,7 +7,7 @@ namespace Badger.Redis.IntegrationTests
 {
     public class ConnectionTesst
     {
-        private static readonly Configuration Config = new Configuration { Host = "127.0.0.1", Port = 6379 };
+        private static readonly Configuration Config = new Configuration { Host = "localhost", Port = 6379 };
 
         [Fact]
         public async Task WhenConnectedStateIsConnected()
@@ -34,7 +34,7 @@ namespace Badger.Redis.IntegrationTests
             {
                 var ex = await Assert.ThrowsAsync<ConnectionException>(() => pool.GetConnectionAsync());
 
-                Assert.Equal("Unable to connect to Redis server at 127.0.0.1:1234", ex.Message);
+                Assert.Equal("Unable to establish a connection to localhost:1234", ex.Message);
 
                 Assert.Equal(0, pool.ActiveConnections);
             }

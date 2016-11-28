@@ -37,9 +37,9 @@ namespace Badger.Redis.Connection
         private IState<ConnectionState> _state;
         public ConnectionState State => _state.State;
 
-        public BasicConnection(IPAddress address, int port, ISocketFactory socketFactory)
+        public BasicConnection(IPEndPoint endPoint, ISocketFactory socketFactory)
         {
-            _state = new Disconnected { EndPoint = new IPEndPoint(address, port) };
+            _state = new Disconnected { EndPoint = endPoint };
             _socketFactory = socketFactory;
         }
 
@@ -47,16 +47,9 @@ namespace Badger.Redis.Connection
         {
             var state = GetState<Disconnected>();
 
-            try
-            {
-                var socket = _socketFactory.Create(state.EndPoint);
-                await socket.OpenAsync();
-                _state = new Connected { Socket = socket };
-            }
-            catch (Exception ex)
-            {
-                throw new ConnectionException($"Unable to connect to Redis server at {state.EndPoint.Address}:{state.EndPoint.Port}", ex);
-            }
+            var socket = _socketFactory.Create(state.EndPoint);
+            await socket.OpenAsync();
+            _state = new Connected { Socket = socket };
 
             await PingAsync(cancellationToken);
         }

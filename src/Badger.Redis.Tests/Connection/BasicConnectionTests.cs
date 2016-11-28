@@ -27,7 +27,7 @@ namespace Badger.Redis.Tests.Connection
                 _socket.SetReturnsDefault(Task.FromResult<IDataType>(new String("PONG")));
                 _socketFactory.SetReturnsDefault(_socket.Object);
 
-                var connection = new BasicConnection(IPAddress.Loopback, 6379, _socketFactory.Object);
+                var connection = new BasicConnection(new IPEndPoint(IPAddress.Loopback, 6379), _socketFactory.Object);
 
                 connection.OpenAsync(CancellationToken.None).Wait();
             }
@@ -69,7 +69,7 @@ namespace Badger.Redis.Tests.Connection
 
                 _socketFactory.SetReturnsDefault(_socket.Object);
 
-                var connection = new BasicConnection(IPAddress.Loopback, 6379, _socketFactory.Object);
+                var connection = new BasicConnection(new IPEndPoint(IPAddress.Loopback, 6379), _socketFactory.Object);
 
                 connection.OpenAsync(CancellationToken.None).Wait();
 

@@ -12,9 +12,9 @@ namespace Badger.Redis.Connection
             _socketFactory = socketFactory;
         }
 
-        public IOpenableConnection Create(IPAddress address, int port)
+        public IOpenableConnection Create(IPEndPoint ipEndPoint)
         {
-            return new BasicConnection(address, port, _socketFactory);
+            return new BasicConnection(ipEndPoint, _socketFactory);
         }
     }
 }

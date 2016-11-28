@@ -21,11 +21,11 @@ namespace Badger.Redis
                 _pool = pool;
             }
 
-            public ConnectionState State => ExecIfNotDisposed(c => c.State);
+            public ConnectionState State => CallUnlessDisposed(c => c.State);
 
-            public Task<string> PingAsync(CancellationToken cancellationToken) => ExecIfNotDisposed(c => c.PingAsync(cancellationToken));
+            public Task<string> PingAsync(CancellationToken cancellationToken) => CallUnlessDisposed(c => c.PingAsync(cancellationToken));
 
-            private T ExecIfNotDisposed<T>(Func<IConnection, T> func)
+            private T CallUnlessDisposed<T>(Func<IConnection, T> func)
             {
                 if (disposed) throw new ObjectDisposedException(nameof(IConnection));
 
@@ -42,19 +42,19 @@ namespace Badger.Redis
         }
 
         private readonly Configuration _configuration;
-        private readonly IConnectionOpener _connectionOpener;
+        private readonly IConnectionCreator _connectionCreator;
         private readonly ConcurrentQueue<IConnection> _availableConnections;
         private int _activeConnections;
         private bool _disposed;
 
         public ConnectionPool(Configuration configuration)
-            : this(configuration, new ConnectionOpener(new BasicConnectionFactory(new SocketFactory())))
+            : this(configuration, new ConnectionCreator(new BasicConnectionFactory(new SocketFactory())))
         {
         }
 
-        internal ConnectionPool(Configuration configuration, IConnectionOpener connectionOpener)
+        internal ConnectionPool(Configuration configuration, IConnectionCreator connectionCreator)
         {
-            _connectionOpener = connectionOpener;
+            _connectionCreator = connectionCreator;
             _configuration = configuration;
             _availableConnections = new ConcurrentQueue<IConnection>();
         }
@@ -93,7 +93,7 @@ namespace Badger.Redis
             var conn = await GetPooledConnectionAsync(cancellationToken);
             if (conn != null) return conn;
 
-            return await _connectionOpener.OpenAsync(_configuration.Host, _configuration.Port, cancellationToken);
+            return await _connectionCreator.CreateOpenedAsync(_configuration.Host, _configuration.Port, cancellationToken);
         }
 
         private async Task<IConnection> GetPooledConnectionAsync(CancellationToken cancellationToken)

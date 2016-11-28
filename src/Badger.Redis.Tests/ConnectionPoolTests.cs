@@ -11,13 +11,13 @@ namespace Badger.Redis.Tests
     {
         public class WhenGettingAConnectionFromAnEmptyPool
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
 
             public WhenGettingAConnectionFromAnEmptyPool()
             {
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
 
                 var connection = _connectionPool.GetConnectionAsync().Result;
@@ -26,7 +26,7 @@ namespace Badger.Redis.Tests
             [Fact]
             public void ThenANewConnectionIsOpened()
             {
-                _connectionFactory.Verify(cf => cf.OpenAsync(_config.Host, _config.Port, CancellationToken.None));
+                _connectionFactory.Verify(cf => cf.CreateOpenedAsync(_config.Host, _config.Port, CancellationToken.None));
             }
 
             [Fact]
@@ -38,7 +38,7 @@ namespace Badger.Redis.Tests
 
         public class WhenReturningAConnectionToThePool
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Mock<IConnection> _connection;
@@ -46,9 +46,9 @@ namespace Badger.Redis.Tests
             public WhenReturningAConnectionToThePool()
             {
                 _connection = new Mock<IConnection>();
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
-                    .Setup(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                    .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                     .Returns(Task.FromResult(_connection.Object));
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
 
@@ -70,7 +70,7 @@ namespace Badger.Redis.Tests
 
         public class WhenGettingAConnectionFromAnNonEmptyPool
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Mock<IConnection> _connection;
@@ -78,9 +78,9 @@ namespace Badger.Redis.Tests
             public WhenGettingAConnectionFromAnNonEmptyPool()
             {
                 _connection = new Mock<IConnection>();
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
-                            .Setup(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                            .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                             .Returns(Task.FromResult(_connection.Object));
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
@@ -94,7 +94,7 @@ namespace Badger.Redis.Tests
             [Fact]
             public void ThenTheExistingConnectionIsReused()
             {
-                _connectionFactory.Verify(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), CancellationToken.None), Times.Never);
+                _connectionFactory.Verify(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), CancellationToken.None), Times.Never);
             }
 
             [Fact]
@@ -112,7 +112,7 @@ namespace Badger.Redis.Tests
 
         public class WhenGettingAConnectionFromAPoolThatIsReachedItsConnectionLimit
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Exception _exception;
@@ -120,7 +120,7 @@ namespace Badger.Redis.Tests
             public WhenGettingAConnectionFromAPoolThatIsReachedItsConnectionLimit()
             {
                 _config.MaxPoolSize = 1;
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Wait();
@@ -139,7 +139,7 @@ namespace Badger.Redis.Tests
             [Fact]
             public void ThenNoNewConnectionIsMade()
             {
-                _connectionFactory.Verify(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), CancellationToken.None), Times.Never);
+                _connectionFactory.Verify(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), CancellationToken.None), Times.Never);
             }
 
             [Fact]
@@ -151,7 +151,7 @@ namespace Badger.Redis.Tests
 
         public class WhenDisposingAConnectionPoolWithPooledConnections
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Mock<IConnection> _connection;
@@ -159,9 +159,9 @@ namespace Badger.Redis.Tests
             public WhenDisposingAConnectionPoolWithPooledConnections()
             {
                 _connection = new Mock<IConnection>();
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
-                            .Setup(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                            .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                             .Returns(Task.FromResult(_connection.Object));
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
@@ -179,7 +179,7 @@ namespace Badger.Redis.Tests
 
         public class WhenDisposingAConnectionPoolWithActiveConnections
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Mock<IConnection> _connection;
@@ -187,9 +187,9 @@ namespace Badger.Redis.Tests
             public WhenDisposingAConnectionPoolWithActiveConnections()
             {
                 _connection = new Mock<IConnection>();
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
-                            .Setup(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                            .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                             .Returns(Task.FromResult(_connection.Object));
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
@@ -207,7 +207,7 @@ namespace Badger.Redis.Tests
 
         public class WhenReturningAnActiveConnectionToADisposedPool
         {
-            private Mock<IConnectionOpener> _connectionFactory;
+            private Mock<IConnectionCreator> _connectionFactory;
             private Configuration _config = new Configuration();
             private ConnectionPool _connectionPool;
             private Mock<IConnection> _connection;
@@ -215,9 +215,9 @@ namespace Badger.Redis.Tests
             public WhenReturningAnActiveConnectionToADisposedPool()
             {
                 _connection = new Mock<IConnection>();
-                _connectionFactory = new Mock<IConnectionOpener>();
+                _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
-                            .Setup(cf => cf.OpenAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                            .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                             .Returns(Task.FromResult(_connection.Object));
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);

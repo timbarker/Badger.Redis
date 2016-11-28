@@ -46,7 +46,7 @@
     <Compile Include="ConnectionPoolException.cs" />
     <Compile Include="Connection\BasicConnectionFactory.cs" />
     <Compile Include="Connection\BasicConnection.cs" />
-    <Compile Include="Connection\ConnectionOpener.cs" />
+    <Compile Include="Connection\ConnectionCreator.cs" />
     <Compile Include="ConnectionPool.cs" />
     <Compile Include="Connection\ConnectionException.cs" />
     <Compile Include="Connection\ConnectionState.cs" />
@@ -63,7 +63,7 @@
     <Compile Include="DataTypes\String.cs" />
     <Compile Include="Connection\IConnection.cs" />
     <Compile Include="Connection\IConnectionFactory.cs" />
-    <Compile Include="Connection\IConnectionOpener.cs" />
+    <Compile Include="Connection\IConnectionCreator.cs" />
     <Compile Include="IO\ISocket.cs" />
     <Compile Include="IO\ISocketFactory.cs" />
     <Compile Include="IO\Socket.cs" />
