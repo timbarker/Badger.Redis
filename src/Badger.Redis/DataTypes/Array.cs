@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Badger.Redis.DataTypes
 {
-    public class Array : IDataType<IDataType[]>, IEnumerable<IDataType>, IEquatable<Array>
+    internal class Array : IDataType<IDataType[]>, IEnumerable<IDataType>, IEquatable<Array>
     {
         public static Array Null = new Array();
         public DataType DataType { get; } = DataType.Array;

@@ -1,4 +1,5 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Commands;
+using Badger.Redis.DataTypes;
 using Badger.Redis.IO;
 using System;
 using System.Net;

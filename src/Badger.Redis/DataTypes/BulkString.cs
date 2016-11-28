@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Badger.Redis.DataTypes
 {
-    public class BulkString : IDataType<byte[]>, IEquatable<BulkString>
+    internal class BulkString : IDataType<byte[]>, IEquatable<BulkString>
     {
         private const int MaxSize = 512 * 1024 * 1024;
 

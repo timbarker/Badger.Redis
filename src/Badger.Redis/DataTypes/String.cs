@@ -2,7 +2,7 @@
 
 namespace Badger.Redis.DataTypes
 {
-    public class String : IDataType<string>, IEquatable<String>
+    internal class String : IDataType<string>, IEquatable<String>
     {
         public DataType DataType { get; } = DataType.String;
         public string Value { get; }

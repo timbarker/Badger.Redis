@@ -2,7 +2,7 @@
 
 namespace Badger.Redis.DataTypes
 {
-    public class Integer : IDataType<long>, IEquatable<Integer>
+    internal class Integer : IDataType<long>, IEquatable<Integer>
     {
         public DataType DataType { get; } = DataType.Integer;
         public long Value { get; }

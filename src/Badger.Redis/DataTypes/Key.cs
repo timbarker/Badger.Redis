@@ -2,7 +2,7 @@
 
 namespace Badger.Redis.DataTypes
 {
-    public class Key : BulkString
+    internal class Key : BulkString
     {
         public Key(params object[] parts)
             : this(string.Join(":", parts))

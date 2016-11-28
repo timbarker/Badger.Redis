@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Badger.Redis.Connection
+namespace Badger.Redis
 {
     public class ConnectionException : Exception
     {

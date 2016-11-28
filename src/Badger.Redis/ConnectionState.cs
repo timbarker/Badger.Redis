@@ -1,4 +1,4 @@
-﻿namespace Badger.Redis.Connection
+﻿namespace Badger.Redis
 {
     public enum ConnectionState
     {

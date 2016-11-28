@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Badger.Redis.Connection
+namespace Badger.Redis
 {
     /// <summary>
     /// Represents a connection to a Redis server.

@@ -2,7 +2,7 @@
 
 namespace Badger.Redis.DataTypes
 {
-    public static class DataTypeExtensions
+    internal static class DataTypeExtensions
     {
         public static char Prefix(this DataType dataType)
         {

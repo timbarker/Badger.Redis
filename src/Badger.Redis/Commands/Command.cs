@@ -1,4 +1,4 @@
-﻿namespace Badger.Redis
+﻿namespace Badger.Redis.Commands
 {
     internal static class Command
     {

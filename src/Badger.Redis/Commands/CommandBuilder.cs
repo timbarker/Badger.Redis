@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Array = Badger.Redis.DataTypes.Array;
 
-namespace Badger.Redis
+namespace Badger.Redis.Commands
 {
     internal class CommandBuilder
     {

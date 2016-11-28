@@ -1,11 +1,11 @@
 ﻿namespace Badger.Redis.DataTypes
 {
-    public interface IDataType
+    internal interface IDataType
     {
         DataType DataType { get; }
     }
 
-    public interface IDataType<T> : IDataType
+    internal interface IDataType<T> : IDataType
     {
         T Value { get; }
     }

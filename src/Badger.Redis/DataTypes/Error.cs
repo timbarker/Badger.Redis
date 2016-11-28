@@ -2,7 +2,7 @@
 
 namespace Badger.Redis.DataTypes
 {
-    public class Error : IDataType<string>, IEquatable<Error>
+    internal class Error : IDataType<string>, IEquatable<Error>
     {
         public DataType DataType { get; } = DataType.Error;
         public string Value { get; }
