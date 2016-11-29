@@ -1,4 +1,4 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +7,6 @@ namespace Badger.Redis.IO
 {
     internal interface IWriter : IDisposable
     {
-        Task WriteAsync(IDataType value, CancellationToken cancellationToken);
+        Task WriteAsync(IRedisType value, CancellationToken cancellationToken);
     }
 }

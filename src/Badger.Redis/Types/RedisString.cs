@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Badger.Redis.DataTypes
+namespace Badger.Redis.Types
 {
-    internal class String : IDataType<string>, IEquatable<String>
+    internal class RedisString : IRedisType<string>, IEquatable<RedisString>
     {
-        public DataType DataType { get; } = DataType.String;
+        public RedisType DataType { get; } = RedisType.String;
         public string Value { get; }
 
-        public String(string value)
+        public RedisString(string value)
         {
             if (value == null)
                 throw new ArgumentException($"{nameof(value)} can't be null", nameof(value));
@@ -22,7 +22,7 @@ namespace Badger.Redis.DataTypes
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as String);
+            return Equals(obj as RedisString);
         }
 
         public override int GetHashCode()
@@ -30,19 +30,19 @@ namespace Badger.Redis.DataTypes
             return Value.GetHashCode();
         }
 
-        public bool Equals(String other)
+        public bool Equals(RedisString other)
         {
             if (ReferenceEquals(other, null)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
         }
 
-        public static bool operator ==(String lhs, String rhs)
+        public static bool operator ==(RedisString lhs, RedisString rhs)
         {
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(String lhs, String rhs)
+        public static bool operator !=(RedisString lhs, RedisString rhs)
         {
             return !lhs.Equals(rhs);
         }

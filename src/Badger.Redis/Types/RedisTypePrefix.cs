@@ -1,6 +1,6 @@
-﻿namespace Badger.Redis.DataTypes
+﻿namespace Badger.Redis.Types
 {
-    internal static class DataTypePrefix
+    internal static class RedisTypePrefix
     {
         public const char String = '+';
         public const char Error = '-';

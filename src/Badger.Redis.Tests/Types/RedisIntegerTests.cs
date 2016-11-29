@@ -1,22 +1,22 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using Xunit;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class IntegerTests
+    public class RedisIntegerTests
     {
         [Fact]
         public void DataTypeIsCorrect()
         {
-            var i = new Integer(0);
+            var i = new RedisInteger(0);
 
-            Assert.Equal(DataType.Integer, i.DataType);
+            Assert.Equal(RedisType.Integer, i.DataType);
         }
 
         [Fact]
         public void ValueIsCorrect()
         {
-            var i = new Integer(1234L);
+            var i = new RedisInteger(1234L);
 
             Assert.Equal(1234L, i.Value);
         }
@@ -24,7 +24,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ToStringCorrect()
         {
-            var i = new Integer(1234);
+            var i = new RedisInteger(1234);
 
             Assert.Equal("1234", i.ToString());
         }
@@ -32,7 +32,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void IntegersAreEqualToItself()
         {
-            var i = new Integer(0);
+            var i = new RedisInteger(0);
 
             Assert.True(i.Equals(i));
         }
@@ -40,7 +40,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void IntegersAreNotEqualToNull()
         {
-            var i = new Integer(0);
+            var i = new RedisInteger(0);
 
             Assert.False(i.Equals(null));
         }
@@ -48,8 +48,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void IntegersWithSameValueAreEqual()
         {
-            var integer1 = new Integer(1234);
-            var integer2 = new Integer(1234);
+            var integer1 = new RedisInteger(1234);
+            var integer2 = new RedisInteger(1234);
 
             Assert.True(integer1.Equals(integer2));
             Assert.True(integer2.Equals(integer1));
@@ -61,8 +61,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void IntegersWithDifferentValueAreNotEqual()
         {
-            var integer1 = new Integer(1234);
-            var integer2 = new Integer(4321);
+            var integer1 = new RedisInteger(1234);
+            var integer2 = new RedisInteger(4321);
 
             Assert.False(integer1.Equals(integer2));
             Assert.False(integer2.Equals(integer1));
@@ -74,8 +74,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void IntegersWithSameContentHaveSameHashCode()
         {
-            var integer1 = new Integer(1234);
-            var integer2 = new Integer(1234);
+            var integer1 = new RedisInteger(1234);
+            var integer2 = new RedisInteger(1234);
 
             Assert.Equal(integer1.GetHashCode(), integer2.GetHashCode());
         }

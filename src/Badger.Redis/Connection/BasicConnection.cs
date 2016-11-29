@@ -1,11 +1,10 @@
 ﻿using Badger.Redis.Commands;
-using Badger.Redis.DataTypes;
+using Badger.Redis.Types;
 using Badger.Redis.IO;
 using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.Connection
 {
@@ -67,11 +66,11 @@ namespace Badger.Redis.Connection
             await PingAsync(cancellationToken);
         }
 
-        private async Task<T> SendAsync<T>(IDataType request, CancellationToken cancellationToken) where T : IDataType
+        private async Task<T> SendAsync<T>(IRedisType request, CancellationToken cancellationToken) where T : IRedisType
         {
             var state = GetState<Connected>();
 
-            IDataType response;
+            IRedisType response;
             try
             {
                 response = await state.Client.SendAsync(request, cancellationToken);
@@ -92,7 +91,7 @@ namespace Badger.Redis.Connection
         {
             GetState<Connected>();
 
-            var response = await SendAsync<String>(new CommandBuilder().WithCommand(Command.PING).Build(), cancellationToken);
+            var response = await SendAsync<RedisString>(new CommandBuilder().WithCommand(Command.PING).Build(), cancellationToken);
             if (response.Value != Response.PONG)
                 throw new ConnectionException($"Invalid PING response - expected '{Response.PONG}' but got '{response}'");
             return response.Value;
@@ -102,7 +101,7 @@ namespace Badger.Redis.Connection
         {
             var state = GetState<Connected>();
 
-            await SendAsync<String>(new CommandBuilder().WithCommand(Command.QUIT).Build(), cancellationToken);
+            await SendAsync<RedisString>(new CommandBuilder().WithCommand(Command.QUIT).Build(), cancellationToken);
             state.Client.Dispose();
             _state = new Closed();
         }

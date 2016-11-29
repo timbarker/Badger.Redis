@@ -1,38 +1,38 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using Xunit;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class DataTypeTests
+    public class RedisTypeTests
     {
         [Fact]
         public void StringPrefixTest()
         {
-            Assert.Equal('+', DataType.String.Prefix());
+            Assert.Equal('+', RedisType.String.Prefix());
         }
 
         [Fact]
         public void ErrorPrefixTest()
         {
-            Assert.Equal('-', DataType.Error.Prefix());
+            Assert.Equal('-', RedisType.Error.Prefix());
         }
 
         [Fact]
         public void IntegerPrefixTest()
         {
-            Assert.Equal(':', DataType.Integer.Prefix());
+            Assert.Equal(':', RedisType.Integer.Prefix());
         }
 
         [Fact]
         public void BulkStringPrefixTest()
         {
-            Assert.Equal('$', DataType.BulkString.Prefix());
+            Assert.Equal('$', RedisType.BulkString.Prefix());
         }
 
         [Fact]
         public void ArrayPrefixTest()
         {
-            Assert.Equal('*', DataType.Array.Prefix());
+            Assert.Equal('*', RedisType.Array.Prefix());
         }
     }
 }

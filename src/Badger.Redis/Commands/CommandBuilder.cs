@@ -1,14 +1,13 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System.Collections.Generic;
 using System.Linq;
-using Array = Badger.Redis.DataTypes.Array;
 
 namespace Badger.Redis.Commands
 {
     internal class CommandBuilder
     {
         private string _command = "";
-        private List<IDataType> _args = new List<IDataType>();
+        private readonly List<IRedisType> _args = new List<IRedisType>();
 
         public CommandBuilder WithCommand(string command)
         {
@@ -16,7 +15,7 @@ namespace Badger.Redis.Commands
             return this;
         }
 
-        public CommandBuilder WithArg(IDataType arg)
+        public CommandBuilder WithArg(IRedisType arg)
         {
             _args.Add(arg);
             return this;
@@ -24,13 +23,13 @@ namespace Badger.Redis.Commands
 
         public CommandBuilder WithArg(string arg)
         {
-            _args.Add(BulkString.FromString(arg));
+            _args.Add(RedisBulkString.FromString(arg));
             return this;
         }
 
-        public IDataType Build()
+        public IRedisType Build()
         {
-            return new Array(new[] { BulkString.FromString(_command) }.Concat(_args).ToArray());
+            return new RedisArray(new[] { RedisBulkString.FromString(_command) }.Concat(_args).ToArray());
         }
     }
 }

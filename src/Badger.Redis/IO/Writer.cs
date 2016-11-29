@@ -1,11 +1,9 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Array = Badger.Redis.DataTypes.Array;
-using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
@@ -27,70 +25,70 @@ namespace Badger.Redis.IO
             _stream = stream;
         }
 
-        public Task WriteAsync(IDataType value, CancellationToken cancellationToken)
+        public Task WriteAsync(IRedisType value, CancellationToken cancellationToken)
         {
             switch (value.DataType)
             {
-                case DataType.String:
-                    return WriteAsync(value as String, cancellationToken);
+                case RedisType.String:
+                    return WriteAsync(value as RedisString, cancellationToken);
 
-                case DataType.Error:
-                    return WriteAsync(value as Error, cancellationToken);
+                case RedisType.Error:
+                    return WriteAsync(value as RedisErorr, cancellationToken);
 
-                case DataType.Integer:
-                    return WriteAsync(value as Integer, cancellationToken);
+                case RedisType.Integer:
+                    return WriteAsync(value as RedisInteger, cancellationToken);
 
-                case DataType.BulkString:
-                    return WriteAsync(value as BulkString, cancellationToken);
+                case RedisType.BulkString:
+                    return WriteAsync(value as RedisBulkString, cancellationToken);
 
-                case DataType.Array:
-                    return WriteAsync(value as Array, cancellationToken);
+                case RedisType.Array:
+                    return WriteAsync(value as RedisArray, cancellationToken);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value));
             }
         }
 
-        private async Task WriteAsync(String value, CancellationToken cancellationToken)
+        private async Task WriteAsync(RedisString value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
 
-        private async Task WriteAsync(Error value, CancellationToken cancellationToken)
+        private async Task WriteAsync(RedisErorr value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
 
-        private async Task WriteAsync(Integer value, CancellationToken cancellationToken)
+        private async Task WriteAsync(RedisInteger value, CancellationToken cancellationToken)
         {
             await WriteSimpleAsync(value, cancellationToken);
         }
 
-        private async Task WriteSimpleAsync(IDataType value, CancellationToken cancellationToken)
+        private async Task WriteSimpleAsync(IRedisType value, CancellationToken cancellationToken)
         {
             var bytes = DefaultEncoding.GetBytes($"{value.DataType.Prefix()}{value}{NewLine}");
             await _stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
         }
 
-        private async Task WriteAsync(BulkString value, CancellationToken cancellationToken)
+        private async Task WriteAsync(RedisBulkString value, CancellationToken cancellationToken)
         {
-            var header = DefaultEncoding.GetBytes($"{DataType.BulkString.Prefix()}{value.Length}");
+            var header = DefaultEncoding.GetBytes($"{RedisType.BulkString.Prefix()}{value.Length}");
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
 
-            if (value == BulkString.Null) return;
+            if (value == RedisBulkString.Null) return;
 
             await _stream.WriteAsync(value.Value, 0, value.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
         }
 
-        private async Task WriteAsync(Array value, CancellationToken cancellationToken)
+        private async Task WriteAsync(RedisArray value, CancellationToken cancellationToken)
         {
-            var header = DefaultEncoding.GetBytes($"{DataType.Array.Prefix()}{value.Length}");
+            var header = DefaultEncoding.GetBytes($"{RedisType.Array.Prefix()}{value.Length}");
             await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
             await _stream.WriteAsync(EncodedNewLine, 0, EncodedNewLine.Length, cancellationToken);
 
-            if (value == Array.Null) return;
+            if (value == RedisArray.Null) return;
 
             foreach (var element in value.Value)
             {

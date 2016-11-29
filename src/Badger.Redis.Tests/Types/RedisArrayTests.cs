@@ -1,38 +1,37 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using Xunit;
-using Array = Badger.Redis.DataTypes.Array;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class ArrayTests
+    public class RedisArrayTests
     {
         [Fact]
         public void DataTypeIsCorrect()
         {
-            var s = new Array();
+            var s = new RedisArray();
 
-            Assert.Equal(DataType.Array, s.DataType);
+            Assert.Equal(RedisType.Array, s.DataType);
         }
 
         [Fact]
         public void ValueIsCorrect()
         {
-            var a = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var a = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
-            Assert.Equal(new IDataType[] { new Integer(1), new Integer(2), new Integer(3) }, a.Value);
+            Assert.Equal(new IRedisType[] { new RedisInteger(1), new RedisInteger(2), new RedisInteger(3) }, a.Value);
         }
 
         [Fact]
         public void EmptyArrayLenghtIsZero()
         {
-            var a = new Array();
+            var a = new RedisArray();
             Assert.Equal(0, a.Length);
         }
 
         [Fact]
         public void EmptyArrayToString()
         {
-            var a = new Array();
+            var a = new RedisArray();
 
             Assert.Equal("[]", a.ToString());
         }
@@ -40,7 +39,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void NonEmptyArrayLengthCorrect()
         {
-            var a = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var a = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.Equal(3, a.Length);
         }
@@ -48,7 +47,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void NonEmptyArrayToStringIsCorrect()
         {
-            var a = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var a = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.Equal("[1, 2, 3]", a.ToString());
         }
@@ -56,15 +55,15 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ConstructingWithNullAllowed()
         {
-            var s = new Array(null);
+            var s = new RedisArray(null);
 
-            Assert.Equal(Array.Null, s);
+            Assert.Equal(RedisArray.Null, s);
         }
 
         [Fact]
         public void ArrayIsEqualToItself()
         {
-            var array = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var array = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.True(array.Equals(array));
         }
@@ -72,7 +71,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ArrayIsNotEqualToNull()
         {
-            var array = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var array = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.False(array.Equals(null));
         }
@@ -80,8 +79,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ArraysWithSameContentAreEqual()
         {
-            var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
-            var array2 = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var array1 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
+            var array2 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.True(array1.Equals(array2));
             Assert.True(array2.Equals(array1));
@@ -93,8 +92,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ArraysWithDifferentContentAreNotEqual()
         {
-            var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
-            var array2 = new Array(new Integer(3), new Integer(2), new Integer(1));
+            var array1 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
+            var array2 = new RedisArray(new RedisInteger(3), new RedisInteger(2), new RedisInteger(1));
 
             Assert.False(array1.Equals(array2));
             Assert.False(array2.Equals(array1));
@@ -106,8 +105,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ArraysWithDifferentLengthAreNotEqual()
         {
-            var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
-            var array2 = new Array(new Integer(1), new Integer(2), new Integer(3), new Integer(4));
+            var array1 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
+            var array2 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3), new RedisInteger(4));
 
             Assert.False(array1.Equals(array2));
             Assert.False(array2.Equals(array1));
@@ -119,8 +118,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ArraysWithSameContentHaveSameHashCode()
         {
-            var array1 = new Array(new Integer(1), new Integer(2), new Integer(3));
-            var array2 = new Array(new Integer(1), new Integer(2), new Integer(3));
+            var array1 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
+            var array2 = new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3));
 
             Assert.Equal(array1.GetHashCode(), array2.GetHashCode());
         }
@@ -128,7 +127,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void NullArrayToString()
         {
-            var a = Array.Null;
+            var a = RedisArray.Null;
 
             Assert.Equal("", a.ToString());
         }
@@ -136,7 +135,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void NullArrayGetHashCode()
         {
-            var a = Array.Null;
+            var a = RedisArray.Null;
 
             Assert.Equal(0, a.GetHashCode());
         }
@@ -144,13 +143,13 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void NullArraysAreEqualToNullArrays()
         {
-            Assert.True(Array.Null.Equals(Array.Null));
+            Assert.True(RedisArray.Null.Equals(RedisArray.Null));
         }
 
         [Fact]
         public void NullArraysLengthNegative1()
         {
-            Assert.Equal(-1, Array.Null.Length);
+            Assert.Equal(-1, RedisArray.Null.Length);
         }
     }
 }

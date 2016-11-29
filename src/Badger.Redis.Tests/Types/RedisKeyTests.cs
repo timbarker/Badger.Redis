@@ -1,23 +1,23 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using Xunit;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class KeyTests
+    public class RedisKeyTests
     {
         [Fact]
         public void DataTypeIsCorrect()
         {
-            var key = new Key("test");
+            var key = new RedisKey("test");
 
-            Assert.Equal(DataType.BulkString, key.DataType);
+            Assert.Equal(RedisType.BulkString, key.DataType);
         }
 
         [Fact]
         public void ValueIsCorrect()
         {
-            var k = new Key("test");
+            var k = new RedisKey("test");
 
             Assert.Equal(new byte[] { 0x74, 0x65, 0x73, 0x74 }, k.Value);
         }
@@ -25,7 +25,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ToStringIsCorrect()
         {
-            var key = new Key("test");
+            var key = new RedisKey("test");
 
             Assert.Equal("test", key.ToString());
         }
@@ -33,7 +33,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeyWithObjectIdAndStringIdToStringIsCorrect()
         {
-            var key = new Key("object", "test");
+            var key = new RedisKey("object", "test");
 
             Assert.Equal("object:test", key.ToString());
         }
@@ -41,7 +41,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeyWithObjectIdAndLongIdToStringIsCorrect()
         {
-            var key = new Key("object", 1234L);
+            var key = new RedisKey("object", 1234L);
 
             Assert.Equal("object:1234", key.ToString());
         }
@@ -50,7 +50,7 @@ namespace Badger.Redis.Tests.DataTypes
         public void KeyWithObjectIdAndGuidIdToStringIsCorrect()
         {
             var id = Guid.Parse("d551622c-ca4b-4fdc-b0ee-8fe3862961c5");
-            var key = new Key("object", id);
+            var key = new RedisKey("object", id);
 
             Assert.Equal("object:d551622c-ca4b-4fdc-b0ee-8fe3862961c5", key.ToString());
         }
@@ -58,7 +58,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeyWithCustomSeperatorToStringIsCorrect()
         {
-            var key = new Key('.', "test", 12345);
+            var key = new RedisKey('.', "test", 12345);
 
             Assert.Equal("test.12345", key.ToString());
         }
@@ -66,7 +66,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeysAreEqualToItself()
         {
-            var key = new Key("test");
+            var key = new RedisKey("test");
 
             Assert.True(key.Equals(key));
         }
@@ -74,7 +74,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeysAreNotEqualToNull()
         {
-            var key = new Key("test");
+            var key = new RedisKey("test");
 
             Assert.False(key.Equals(null));
         }
@@ -82,8 +82,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void BulkStringsWithSameContentAreEqual()
         {
-            var key1 = new Key("test");
-            var key2 = new Key("test");
+            var key1 = new RedisKey("test");
+            var key2 = new RedisKey("test");
 
             Assert.True(key1.Equals(key2));
             Assert.True(key2.Equals(key1));
@@ -95,8 +95,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeysWithDifferentContentAreNotEqual()
         {
-            var key1 = new Key("test1");
-            var key2 = new Key("test2");
+            var key1 = new RedisKey("test1");
+            var key2 = new RedisKey("test2");
 
             Assert.False(key1.Equals(key2));
             Assert.False(key2.Equals(key1));
@@ -108,8 +108,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void KeyssWithSameContentHaveSameHashCode()
         {
-            var key1 = new Key("test");
-            var key2 = new Key("test");
+            var key1 = new RedisKey("test");
+            var key2 = new RedisKey("test");
 
             Assert.Equal(key1.GetHashCode(), key2.GetHashCode());
         }

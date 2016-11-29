@@ -1,4 +1,4 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,7 +28,7 @@ namespace Badger.Redis.IO
             _sem.Dispose();
         }
 
-        public async Task<IDataType> SendAsync(IDataType data, CancellationToken cancellationToken)
+        public async Task<IRedisType> SendAsync(IRedisType data, CancellationToken cancellationToken)
         {
             await _sem.WaitAsync(cancellationToken);
 

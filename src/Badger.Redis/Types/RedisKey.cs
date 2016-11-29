@@ -1,18 +1,18 @@
 ﻿using System.Text;
 
-namespace Badger.Redis.DataTypes
+namespace Badger.Redis.Types
 {
-    internal class Key : BulkString
+    internal class RedisKey : RedisBulkString
     {
-        public Key(params object[] parts)
+        public RedisKey(params object[] parts)
             : this(string.Join(":", parts))
         { }
 
-        public Key(char seperator, params object[] parts)
+        public RedisKey(char seperator, params object[] parts)
             : this(string.Join(seperator.ToString(), parts))
         { }
 
-        public Key(string key)
+        public RedisKey(string key)
             : base(Encoding.UTF8.GetBytes(key))
         { }
 

@@ -1,6 +1,6 @@
-﻿namespace Badger.Redis.DataTypes
+﻿namespace Badger.Redis.Types
 {
-    internal enum DataType
+    internal enum RedisType
     {
         String,
         Error,

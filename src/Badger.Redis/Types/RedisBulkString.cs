@@ -2,22 +2,22 @@
 using System.Linq;
 using System.Text;
 
-namespace Badger.Redis.DataTypes
+namespace Badger.Redis.Types
 {
-    internal class BulkString : IDataType<byte[]>, IEquatable<BulkString>
+    internal class RedisBulkString : IRedisType<byte[]>, IEquatable<RedisBulkString>
     {
         private const int MaxSize = 512 * 1024 * 1024;
 
-        public static BulkString Null = new BulkString();
-        public DataType DataType { get; } = DataType.BulkString;
+        public static RedisBulkString Null = new RedisBulkString();
+        public RedisType DataType { get; } = RedisType.BulkString;
         public byte[] Value { get; }
         public int Length => Value?.Length ?? -1;
 
-        private BulkString()
+        private RedisBulkString()
         {
         }
 
-        public BulkString(byte[] value)
+        public RedisBulkString(byte[] value)
         {
             if (value == null) return;
 
@@ -27,9 +27,9 @@ namespace Badger.Redis.DataTypes
             Value = value;
         }
 
-        public static BulkString FromString(string value, Encoding encoding = null)
+        public static RedisBulkString FromString(string value, Encoding encoding = null)
         {
-            return new BulkString((encoding ?? Encoding.UTF8).GetBytes(value));
+            return new RedisBulkString((encoding ?? Encoding.UTF8).GetBytes(value));
         }
 
         public override string ToString()
@@ -39,7 +39,7 @@ namespace Badger.Redis.DataTypes
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as BulkString);
+            return Equals(obj as RedisBulkString);
         }
 
         public override int GetHashCode()
@@ -51,7 +51,7 @@ namespace Badger.Redis.DataTypes
             }
         }
 
-        public bool Equals(BulkString other)
+        public bool Equals(RedisBulkString other)
         {
             if (ReferenceEquals(other, null)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -61,12 +61,12 @@ namespace Badger.Redis.DataTypes
             return Value.SequenceEqual(other.Value);
         }
 
-        public static bool operator ==(BulkString lhs, BulkString rhs)
+        public static bool operator ==(RedisBulkString lhs, RedisBulkString rhs)
         {
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(BulkString lhs, BulkString rhs)
+        public static bool operator !=(RedisBulkString lhs, RedisBulkString rhs)
         {
             return !lhs.Equals(rhs);
         }

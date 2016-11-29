@@ -1,4 +1,4 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using Badger.Redis.IO;
 using System;
 using System.IO;
@@ -6,8 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Array = Badger.Redis.DataTypes.Array;
-using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.Tests.IO
 {
@@ -34,7 +32,7 @@ namespace Badger.Redis.Tests.IO
             _stream.Seek(0, SeekOrigin.Begin);
         }
 
-        private async Task<T> ReadAsync<T>(CancellationToken? cancellationToken = null) where T : IDataType
+        private async Task<T> ReadAsync<T>(CancellationToken? cancellationToken = null) where T : IRedisType
         {
             return (T)(await _reader.ReadAsync(cancellationToken ?? CancellationToken.None));
         }
@@ -44,9 +42,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("+OK\r\n");
 
-            var result = await ReadAsync<String>();
+            var result = await ReadAsync<RedisString>();
 
-            Assert.Equal(new String("OK"), result);
+            Assert.Equal(new RedisString("OK"), result);
         }
 
         [Fact]
@@ -54,9 +52,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("-Error message\r\n");
 
-            var result = await ReadAsync<Error>();
+            var result = await ReadAsync<RedisErorr>();
 
-            Assert.Equal(new Error("Error message"), result);
+            Assert.Equal(new RedisErorr("Error message"), result);
         }
 
         [Fact]
@@ -64,7 +62,7 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream(":1000\r\n");
 
-            var result = await ReadAsync<Integer>();
+            var result = await ReadAsync<RedisInteger>();
 
             Assert.Equal(1000, result.Value);
         }
@@ -74,9 +72,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("$6\r\nfoobar\r\n");
 
-            var result = await ReadAsync<BulkString>();
+            var result = await ReadAsync<RedisBulkString>();
 
-            Assert.Equal(BulkString.FromString("foobar"), result);
+            Assert.Equal(RedisBulkString.FromString("foobar"), result);
         }
 
         [Fact]
@@ -84,9 +82,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("$0\r\n\r\n");
 
-            var result = await ReadAsync<BulkString>();
+            var result = await ReadAsync<RedisBulkString>();
 
-            Assert.Equal(BulkString.FromString(""), result);
+            Assert.Equal(RedisBulkString.FromString(""), result);
         }
 
         [Fact]
@@ -94,9 +92,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("$-1\r\n");
 
-            var result = await ReadAsync<BulkString>();
+            var result = await ReadAsync<RedisBulkString>();
 
-            Assert.Equal(BulkString.Null, result);
+            Assert.Equal(RedisBulkString.Null, result);
         }
 
         [Fact]
@@ -104,9 +102,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*0\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(), result);
+            Assert.Equal(new RedisArray(), result);
         }
 
         [Fact]
@@ -114,9 +112,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*1\r\n+OK\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(new String("OK")), result.Value);
+            Assert.Equal(new RedisArray(new RedisString("OK")), result.Value);
         }
 
         [Fact]
@@ -124,9 +122,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*3\r\n:1\r\n:2\r\n:3\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(new Integer(1), new Integer(2), new Integer(3)), result);
+            Assert.Equal(new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3)), result);
         }
 
         [Fact]
@@ -134,9 +132,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*1\r\n-Error message\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(new Error("Error message")), result);
+            Assert.Equal(new RedisArray(new RedisErorr("Error message")), result);
         }
 
         [Fact]
@@ -144,9 +142,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(BulkString.FromString("foo"), BulkString.FromString("bar")), result);
+            Assert.Equal(new RedisArray(RedisBulkString.FromString("foo"), RedisBulkString.FromString("bar")), result);
         }
 
         [Fact]
@@ -154,9 +152,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$6\r\nfoobar\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(new Integer(1), new Integer(2), new Integer(3), new Integer(4), BulkString.FromString("foobar")), result);
+            Assert.Equal(new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3), new RedisInteger(4), RedisBulkString.FromString("foobar")), result);
         }
 
         [Fact]
@@ -164,9 +162,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*-1\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(Array.Null, result);
+            Assert.Equal(RedisArray.Null, result);
         }
 
         [Fact]
@@ -174,11 +172,11 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Foo\r\n-Bar\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(
-                            new Array(new Integer(1), new Integer(2), new Integer(3)),
-                            new Array(new String("Foo"), new Error("Bar"))),
+            Assert.Equal(new RedisArray(
+                            new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3)),
+                            new RedisArray(new RedisString("Foo"), new RedisErorr("Bar"))),
                          result);
         }
 
@@ -187,9 +185,9 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("*3\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n");
 
-            var result = await ReadAsync<Array>();
+            var result = await ReadAsync<RedisArray>();
 
-            Assert.Equal(new Array(BulkString.FromString("foo"), BulkString.Null, BulkString.FromString("bar")), result);
+            Assert.Equal(new RedisArray(RedisBulkString.FromString("foo"), RedisBulkString.Null, RedisBulkString.FromString("bar")), result);
         }
 
         [Theory]
@@ -203,7 +201,7 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream(data);
 
-            var ex = await Assert.ThrowsAsync<IOException>(async () => await ReadAsync<IDataType>());
+            var ex = await Assert.ThrowsAsync<IOException>(async () => await ReadAsync<IRedisType>());
             Assert.Equal(expectedMessage, ex.Message);
         }
 
@@ -213,7 +211,7 @@ namespace Badger.Redis.Tests.IO
             SetupStream("invalid");
 
             var cts = new CancellationTokenSource(50);
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await ReadAsync<IDataType>(cts.Token));
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await ReadAsync<IRedisType>(cts.Token));
         }
 
         [Fact]
@@ -221,23 +219,23 @@ namespace Badger.Redis.Tests.IO
         {
             SetupStream("+OK\r\n+Test\r\n:100\r\n*3\r\n:1\r\n:2\r\n:3\r\n$6\r\nfoobar\r\n-Error message\r\n");
 
-            IDataType result = await ReadAsync<String>();
-            Assert.Equal(new String("OK"), result);
+            IRedisType result = await ReadAsync<RedisString>();
+            Assert.Equal(new RedisString("OK"), result);
 
-            result = await ReadAsync<String>();
-            Assert.Equal(new String("Test"), result);
+            result = await ReadAsync<RedisString>();
+            Assert.Equal(new RedisString("Test"), result);
 
-            result = await ReadAsync<Integer>();
-            Assert.Equal(new Integer(100), result);
+            result = await ReadAsync<RedisInteger>();
+            Assert.Equal(new RedisInteger(100), result);
 
-            result = await ReadAsync<Array>();
-            Assert.Equal(new Array(new Integer(1), new Integer(2), new Integer(3)), result);
+            result = await ReadAsync<RedisArray>();
+            Assert.Equal(new RedisArray(new RedisInteger(1), new RedisInteger(2), new RedisInteger(3)), result);
 
-            result = await ReadAsync<BulkString>();
-            Assert.Equal(BulkString.FromString("foobar"), result);
+            result = await ReadAsync<RedisBulkString>();
+            Assert.Equal(RedisBulkString.FromString("foobar"), result);
 
-            result = await ReadAsync<Error>();
-            Assert.Equal(new Error("Error message"), result);
+            result = await ReadAsync<RedisErorr>();
+            Assert.Equal(new RedisErorr("Error message"), result);
         }
     }
 }

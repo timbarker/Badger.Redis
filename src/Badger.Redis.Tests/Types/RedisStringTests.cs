@@ -1,24 +1,23 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using Xunit;
-using String = Badger.Redis.DataTypes.String;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class StringTests
+    public class RedisStringTests
     {
         [Fact]
         public void DataTypeIsCorrect()
         {
-            var s = new String("");
+            var s = new RedisString("");
 
-            Assert.Equal(DataType.String, s.DataType);
+            Assert.Equal(RedisType.String, s.DataType);
         }
 
         [Fact]
         public void ValueIsCorrect()
         {
-            var s = new String("test");
+            var s = new RedisString("test");
 
             Assert.Equal("test", s.Value);
         }
@@ -26,7 +25,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ToStringCorrect()
         {
-            var s = new String("test");
+            var s = new RedisString("test");
 
             Assert.Equal("test", s.ToString());
         }
@@ -34,7 +33,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ConstructingWithNullStringNotAllowed()
         {
-            var ex = Assert.Throws<ArgumentException>(() => new String(null));
+            var ex = Assert.Throws<ArgumentException>(() => new RedisString(null));
 
             Assert.StartsWith("value can't be null", ex.Message);
             Assert.Equal("value", ex.ParamName);
@@ -43,7 +42,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringsAreEqualToItself()
         {
-            var s = new String("test");
+            var s = new RedisString("test");
 
             Assert.True(s.Equals(s));
         }
@@ -51,7 +50,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringsAreNotEqualToNull()
         {
-            var s = new String("test");
+            var s = new RedisString("test");
 
             Assert.False(s.Equals(null));
         }
@@ -59,8 +58,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringsWithSameContentAreEqual()
         {
-            var string1 = new String("test");
-            var string2 = new String("test");
+            var string1 = new RedisString("test");
+            var string2 = new RedisString("test");
 
             Assert.True(string1.Equals(string2));
             Assert.True(string2.Equals(string1));
@@ -72,8 +71,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringsWithDifferentContentAreNotEqual()
         {
-            var string1 = new String("test1");
-            var string2 = new String("test2");
+            var string1 = new RedisString("test1");
+            var string2 = new RedisString("test2");
 
             Assert.False(string1.Equals(string2));
             Assert.False(string2.Equals(string1));
@@ -85,8 +84,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void StringsWithSameContentHaveSameHashCode()
         {
-            var string1 = new String("test");
-            var string2 = new String("test");
+            var string1 = new RedisString("test");
+            var string2 = new RedisString("test");
 
             Assert.Equal(string1.GetHashCode(), string2.GetHashCode());
         }

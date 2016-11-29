@@ -1,20 +1,18 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Array = Badger.Redis.DataTypes.Array;
-using String = Badger.Redis.DataTypes.String;
 
 namespace Badger.Redis.IO
 {
     internal class Reader : IReader
     {
-        private Stream _stream;
-        private List<byte> _readBuffer;
-        private byte[] _lineBuffer;
+        private readonly Stream _stream;
+        private readonly List<byte> _readBuffer;
+        private readonly byte[] _lineBuffer;
 
         private static readonly Encoding DefaultEncoding = Encoding.ASCII;
 
@@ -30,7 +28,7 @@ namespace Badger.Redis.IO
             _stream.Dispose();
         }
 
-        public async Task<IDataType> ReadAsync(CancellationToken cancellationToken)
+        public async Task<IRedisType> ReadAsync(CancellationToken cancellationToken)
         {
             var line = await ReadLineAsync(cancellationToken);
             var prefix = line[0];
@@ -38,19 +36,19 @@ namespace Badger.Redis.IO
 
             switch (prefix)
             {
-                case DataTypePrefix.String:
-                    return new String(value);
+                case RedisTypePrefix.String:
+                    return new RedisString(value);
 
-                case DataTypePrefix.Error:
-                    return new Error(value);
+                case RedisTypePrefix.Error:
+                    return new RedisErorr(value);
 
-                case DataTypePrefix.Integer:
+                case RedisTypePrefix.Integer:
                     return ReadInteger(value);
 
-                case DataTypePrefix.BulkString:
+                case RedisTypePrefix.BulkString:
                     return await ReadBulkStringAsync(value, cancellationToken);
 
-                case DataTypePrefix.Array:
+                case RedisTypePrefix.Array:
                     return await ReadArrayAsync(value, cancellationToken);
 
                 default:
@@ -58,43 +56,43 @@ namespace Badger.Redis.IO
             }
         }
 
-        private IDataType ReadInteger(string value)
+        private IRedisType ReadInteger(string value)
         {
             long integer;
             if (!long.TryParse(value, out integer))
                 throw new IOException($"Invalid Integer value '{value}'");
 
-            return new Integer(integer);
+            return new RedisInteger(integer);
         }
 
-        private async Task<IDataType> ReadBulkStringAsync(string value, CancellationToken cancellationToken)
+        private async Task<IRedisType> ReadBulkStringAsync(string value, CancellationToken cancellationToken)
         {
             int length;
             if (!int.TryParse(value, out length) || length < -1)
                 throw new IOException($"Invalid BulkString length '{value}'");
 
-            if (length == -1) return BulkString.Null;
+            if (length == -1) return RedisBulkString.Null;
 
             var bytes = await ReadBytesAsync(length, cancellationToken);
             await ReadLineAsync(cancellationToken);
-            return new BulkString(bytes);
+            return new RedisBulkString(bytes);
         }
 
-        private async Task<IDataType> ReadArrayAsync(string value, CancellationToken cancellationToken)
+        private async Task<IRedisType> ReadArrayAsync(string value, CancellationToken cancellationToken)
         {
             int length;
             if (!int.TryParse(value, out length) || length < -1)
                 throw new IOException($"Invalid Array length '{value}'");
 
-            if (length == -1) return Array.Null;
+            if (length == -1) return RedisArray.Null;
 
-            var items = new IDataType[length];
+            var items = new IRedisType[length];
             for (int i = 0; i < length; i++)
             {
                 items[i] = await ReadAsync(cancellationToken);
             }
 
-            return new Array(items);
+            return new RedisArray(items);
         }
 
         private async Task<string> ReadLineAsync(CancellationToken cancellationToken)
@@ -120,7 +118,7 @@ namespace Badger.Redis.IO
         private async Task<byte[]> ReadBytesAsync(int count, CancellationToken cancellationToken)
         {
             var readBuffer = new byte[count];
-            int bytesRead = Math.Min(count, _readBuffer.Count);
+            var bytesRead = Math.Min(count, _readBuffer.Count);
             _readBuffer.CopyTo(0, readBuffer, 0, bytesRead);
             _readBuffer.RemoveRange(0, bytesRead);
 

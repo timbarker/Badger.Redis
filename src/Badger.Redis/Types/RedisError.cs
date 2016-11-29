@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Badger.Redis.DataTypes
+namespace Badger.Redis.Types
 {
-    internal class Error : IDataType<string>, IEquatable<Error>
+    internal class RedisErorr : IRedisType<string>, IEquatable<RedisErorr>
     {
-        public DataType DataType { get; } = DataType.Error;
+        public RedisType DataType { get; } = RedisType.Error;
         public string Value { get; }
 
-        public Error(string value)
+        public RedisErorr(string value)
         {
             if (value == null)
                 throw new ArgumentException($"{nameof(value)} can't be null", nameof(value));
@@ -22,7 +22,7 @@ namespace Badger.Redis.DataTypes
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Error);
+            return Equals(obj as RedisErorr);
         }
 
         public override int GetHashCode()
@@ -30,19 +30,19 @@ namespace Badger.Redis.DataTypes
             return Value.GetHashCode();
         }
 
-        public bool Equals(Error other)
+        public bool Equals(RedisErorr other)
         {
             if (ReferenceEquals(other, null)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
         }
 
-        public static bool operator ==(Error lhs, Error rhs)
+        public static bool operator ==(RedisErorr lhs, RedisErorr rhs)
         {
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Error lhs, Error rhs)
+        public static bool operator !=(RedisErorr lhs, RedisErorr rhs)
         {
             return !lhs.Equals(rhs);
         }

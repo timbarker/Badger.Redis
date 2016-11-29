@@ -1,23 +1,23 @@
-﻿using Badger.Redis.DataTypes;
+﻿using Badger.Redis.Types;
 using System;
 using Xunit;
 
-namespace Badger.Redis.Tests.DataTypes
+namespace Badger.Redis.Tests.Types
 {
-    public class ErrorTests
+    public class RedisErrorTests
     {
         [Fact]
         public void DataTypeIsCorrect()
         {
-            var e = new Error("");
+            var e = new RedisErorr("");
 
-            Assert.Equal(DataType.Error, e.DataType);
+            Assert.Equal(RedisType.Error, e.DataType);
         }
 
         [Fact]
         public void ValueIsCorrect()
         {
-            var e = new Error("test");
+            var e = new RedisErorr("test");
 
             Assert.Equal("test", e.Value);
         }
@@ -25,7 +25,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ToStringCorrect()
         {
-            var e = new Error("error message");
+            var e = new RedisErorr("error message");
 
             Assert.Equal("error message", e.ToString());
         }
@@ -33,7 +33,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ConstructingWithNullStringNotAllowed()
         {
-            var ex = Assert.Throws<ArgumentException>(() => new Error(null));
+            var ex = Assert.Throws<ArgumentException>(() => new RedisErorr(null));
 
             Assert.StartsWith("value can't be null", ex.Message);
             Assert.Equal("value", ex.ParamName);
@@ -42,7 +42,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ErrorsAreEqualToItself()
         {
-            var e = new Error("test");
+            var e = new RedisErorr("test");
 
             Assert.True(e.Equals(e));
         }
@@ -50,7 +50,7 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ErrorsAreNotEqualToNull()
         {
-            var e = new Error("test");
+            var e = new RedisErorr("test");
 
             Assert.False(e.Equals(null));
         }
@@ -58,8 +58,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ErrorsWithSameContentAreEqual()
         {
-            var error1 = new Error("test");
-            var error2 = new Error("test");
+            var error1 = new RedisErorr("test");
+            var error2 = new RedisErorr("test");
 
             Assert.True(error1.Equals(error2));
             Assert.True(error2.Equals(error1));
@@ -71,8 +71,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ErrorsWithDifferentContentAreNotEqual()
         {
-            var error1 = new Error("test1");
-            var error2 = new Error("test2");
+            var error1 = new RedisErorr("test1");
+            var error2 = new RedisErorr("test2");
 
             Assert.False(error1.Equals(error2));
             Assert.False(error2.Equals(error1));
@@ -84,8 +84,8 @@ namespace Badger.Redis.Tests.DataTypes
         [Fact]
         public void ErrorsWithSameContentHaveSameHashCode()
         {
-            var error1 = new Error("test");
-            var error2 = new Error("test");
+            var error1 = new RedisErorr("test");
+            var error2 = new RedisErorr("test");
 
             Assert.Equal(error1.GetHashCode(), error2.GetHashCode());
         }
