@@ -54,5 +54,18 @@ namespace Badger.Redis.IntegrationTests
                 Assert.Equal(1, pool.ActiveConnections);
             }
         }
+
+        [Fact]
+        public async Task OverlappedAsyncOperationsOnAConnection()
+        {
+            using (var pool = new ConnectionPool(Config))
+            using (var connection = await pool.GetConnectionAsync())
+            {
+                var t1 = connection.PingAsync(CancellationToken.None);
+                var t2 = connection.PingAsync(CancellationToken.None);
+
+                await Task.WhenAll(t1, t2);
+            }
+        }
     }
 }
