@@ -1,6 +1,6 @@
 ﻿using Badger.Redis.Connection;
-using Badger.Redis.Types;
 using Badger.Redis.IO;
+using Badger.Redis.Types;
 using Moq;
 using System.Linq;
 using System.Net;

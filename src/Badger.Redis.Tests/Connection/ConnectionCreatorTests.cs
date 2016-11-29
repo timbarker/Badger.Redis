@@ -66,7 +66,6 @@ namespace Badger.Redis.Tests.Connection
                 _connectionFactory.Verify(cf => cf.Create(It.Is<IPEndPoint>(ipe => ipe.Address.Equals(IPAddress.IPv6Loopback) && ipe.Port == 1234)));
             }
 
-
             [Fact]
             public void ThenTheConnectionIsOpened()
             {
@@ -98,7 +97,6 @@ namespace Badger.Redis.Tests.Connection
             {
                 _connectionFactory.Verify(cf => cf.Create(It.Is<IPEndPoint>(ipe => ipe.Address.Equals(IPAddress.IPv6Loopback) && ipe.Port == 1234)));
             }
-
 
             [Fact]
             public void ThenTheConnectionIsOpened()

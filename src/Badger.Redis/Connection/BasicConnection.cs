@@ -1,6 +1,6 @@
 ﻿using Badger.Redis.Commands;
-using Badger.Redis.Types;
 using Badger.Redis.IO;
+using Badger.Redis.Types;
 using System;
 using System.Net;
 using System.Threading;
