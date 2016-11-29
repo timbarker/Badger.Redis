@@ -15,17 +15,17 @@ namespace Badger.Redis.Tests.Connection
 {
     public class BasicConnectionTests
     {
-        public class GivenAConnectionWhenConnecting
+        public class WhenConnecting
         {
             private Mock<IClientFactory> _clientFactory;
-            private Mock<IClient> _socket;
+            private Mock<IClient> _client;
 
-            public GivenAConnectionWhenConnecting()
+            public WhenConnecting()
             {
                 _clientFactory = new Mock<IClientFactory>();
-                _socket = new Mock<IClient>();
-                _socket.SetReturnsDefault(Task.FromResult<IDataType>(new String("PONG")));
-                _clientFactory.SetReturnsDefault(Task.FromResult(_socket.Object));
+                _client = new Mock<IClient>();
+                _client.SetReturnsDefault(Task.FromResult<IDataType>(new String("PONG")));
+                _clientFactory.SetReturnsDefault(Task.FromResult(_client.Object));
 
                 var connection = new BasicConnection(new IPEndPoint(IPAddress.Loopback, 6379), _clientFactory.Object);
 
@@ -41,18 +41,18 @@ namespace Badger.Redis.Tests.Connection
             [Fact]
             public void ThenAPingMessageIsSent()
             {
-                _socket.Verify(s => s.SendAsync(It.Is<IDataType>(dt => dt.DataType == DataType.Array &&
+                _client.Verify(c => c.SendAsync(It.Is<IDataType>(dt => dt.DataType == DataType.Array &&
                                                                         (dt as Array).Cast<BulkString>().First() == BulkString.FromString("PING", Encoding.ASCII)),
                                                 CancellationToken.None));
             }
         }
 
-        public class GivenAConnectionWhenDisconnecting
+        public class WhenDisconnecting
         {
             private Mock<IClientFactory> _clientFactory;
             private Mock<IClient> _client;
 
-            public GivenAConnectionWhenDisconnecting()
+            public WhenDisconnecting()
             {
                 _clientFactory = new Mock<IClientFactory>();
                 _client = new Mock<IClient>();
@@ -83,6 +83,36 @@ namespace Badger.Redis.Tests.Connection
             {
                 _client.Verify(s => s.SendAsync(It.Is<IDataType>(dt => dt.DataType == DataType.Array &&
                                                                         (dt as Array).Cast<BulkString>().First() == BulkString.FromString("QUIT", Encoding.ASCII)),
+                                                CancellationToken.None));
+            }
+        }
+
+        public class WhenSendingAPing
+        {
+            private Mock<IClientFactory> _clientFactory;
+            private Mock<IClient> _client;
+
+            public WhenSendingAPing()
+            {
+                _clientFactory = new Mock<IClientFactory>();
+                _client = new Mock<IClient>();
+                _client.SetReturnsDefault(Task.FromResult<IDataType>(new String("PONG")));
+                _clientFactory.SetReturnsDefault(Task.FromResult(_client.Object));
+
+                var connection = new BasicConnection(new IPEndPoint(IPAddress.Loopback, 6379), _clientFactory.Object);
+
+                connection.OpenAsync(CancellationToken.None).Wait();
+
+                _client.ResetCalls();
+
+                connection.PingAsync(CancellationToken.None).Wait();
+            }
+
+            [Fact]
+            public void ThenAPingMessageIsSent()
+            {
+                _client.Verify(c => c.SendAsync(It.Is<IDataType>(dt => dt.DataType == DataType.Array &&
+                                                                        (dt as Array).Cast<BulkString>().First() == BulkString.FromString("PING", Encoding.ASCII)),
                                                 CancellationToken.None));
             }
         }

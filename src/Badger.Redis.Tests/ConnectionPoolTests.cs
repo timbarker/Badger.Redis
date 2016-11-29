@@ -199,9 +199,15 @@ namespace Badger.Redis.Tests
             }
 
             [Fact]
-            public void ThenThePooledConnectionIsNotDisposed()
+            public void ThenTheActiveConnectionIsNotDisposed()
             {
                 _connection.Verify(c => c.Dispose(), Times.Never);
+            }
+
+            [Fact]
+            public void ThenTheActiveConnectionCountIsOne()
+            {
+                Assert.Equal(1, _connectionPool.ActiveConnections);
             }
         }
 
@@ -232,6 +238,12 @@ namespace Badger.Redis.Tests
             public void ThenTheActiveConnectionIsDisposed()
             {
                 _connection.Verify(c => c.Dispose());
+            }
+
+            [Fact]
+            public void ThenTheActiveConnectionCountIsZero()
+            {
+                Assert.Equal(0, _connectionPool.ActiveConnections);
             }
         }
     }

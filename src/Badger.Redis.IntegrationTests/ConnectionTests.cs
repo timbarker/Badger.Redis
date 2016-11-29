@@ -1,5 +1,4 @@
-﻿using Badger.Redis.Connection;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 

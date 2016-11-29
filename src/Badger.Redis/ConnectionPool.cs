@@ -117,13 +117,15 @@ namespace Badger.Redis
 
         private void Return(IConnection conn)
         {
-            if (_disposed)
+            if (!_disposed)
+            {
+                _availableConnections.Enqueue(conn);
+            }
+            else
             {
                 conn.Dispose();
-                return;
             }
 
-            _availableConnections.Enqueue(conn);
             Interlocked.Decrement(ref _activeConnections);
         }
 
