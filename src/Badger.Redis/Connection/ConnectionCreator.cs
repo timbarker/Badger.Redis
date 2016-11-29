@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +19,7 @@ namespace Badger.Redis.Connection
             if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
                 throw new ConnectionException($"Port {port} outside of the range {IPEndPoint.MinPort} to {IPEndPoint.MaxPort}");
 
-            var addresses = await GetHostNamesAsync(host);
-            foreach (var address in addresses)
+            foreach (var address in await ResolveHostAsync(host))
             {
                 try
                 {
@@ -38,7 +36,7 @@ namespace Badger.Redis.Connection
             throw new ConnectionException($"Unable to establish a connection to {host}:{port}");
         }
 
-        private async Task<IPAddress[]> GetHostNamesAsync(string host)
+        private async Task<IPAddress[]> ResolveHostAsync(string host)
         {
             try
             {

@@ -21,11 +21,11 @@ namespace Badger.Redis
                 _pool = pool;
             }
 
-            public ConnectionState State => CallUnlessDisposed(c => c.State);
+            public ConnectionState State => PassThrough(c => c.State);
 
-            public Task<string> PingAsync(CancellationToken cancellationToken) => CallUnlessDisposed(c => c.PingAsync(cancellationToken));
+            public Task<string> PingAsync(CancellationToken cancellationToken) => PassThrough(c => c.PingAsync(cancellationToken));
 
-            private T CallUnlessDisposed<T>(Func<IConnection, T> func)
+            private T PassThrough<T>(Func<IConnection, T> func)
             {
                 if (disposed) throw new ObjectDisposedException(nameof(IConnection));
 

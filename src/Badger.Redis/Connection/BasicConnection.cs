@@ -1,7 +1,6 @@
 ﻿using Badger.Redis.Commands;
 using Badger.Redis.DataTypes;
 using Badger.Redis.IO;
-using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,29 +12,29 @@ namespace Badger.Redis.Connection
     {
         private IClientFactory _clientFactory;
 
-        private interface IState<TState>
+        private interface IState
         {
-            TState State { get; }
+            ConnectionState State { get; }
         }
 
-        private class Disconnected : IState<ConnectionState>
+        private class Disconnected : IState
         {
             public IPEndPoint EndPoint { get; set; }
             public ConnectionState State => ConnectionState.Disconnected;
         }
 
-        private class Connected : IState<ConnectionState>
+        private class Connected : IState
         {
             public IClient Client { get; set; }
             public ConnectionState State => ConnectionState.Connected;
         }
 
-        private class Closed : IState<ConnectionState>
+        private class Closed : IState
         {
             public ConnectionState State => ConnectionState.Closed;
         }
 
-        private IState<ConnectionState> _state;
+        private IState _state;
         public ConnectionState State => _state.State;
 
         public BasicConnection(IPEndPoint endPoint, IClientFactory clientFactory)
@@ -84,7 +83,7 @@ namespace Badger.Redis.Connection
             _state = new Closed();
         }
 
-        private T GetState<T>() where T : class, IState<ConnectionState>
+        private T GetState<T>() where T : class, IState
         {
             var state = _state as T;
             if (state == null)
