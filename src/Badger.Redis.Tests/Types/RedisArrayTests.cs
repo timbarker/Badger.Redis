@@ -10,7 +10,7 @@ namespace Badger.Redis.Tests.Types
         {
             var s = new RedisArray();
 
-            Assert.Equal(RedisType.Array, s.DataType);
+            Assert.Equal(RedisType.Array, s.RedisType);
         }
 
         [Fact]

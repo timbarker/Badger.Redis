@@ -2,7 +2,7 @@
 {
     internal interface IRedisType
     {
-        RedisType DataType { get; }
+        RedisType RedisType { get; }
     }
 
     internal interface IRedisType<T> : IRedisType

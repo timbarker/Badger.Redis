@@ -27,7 +27,7 @@ namespace Badger.Redis.IO
 
         public Task WriteAsync(IRedisType value, CancellationToken cancellationToken)
         {
-            switch (value.DataType)
+            switch (value.RedisType)
             {
                 case RedisType.String:
                     return WriteAsync(value as RedisString, cancellationToken);
@@ -66,7 +66,7 @@ namespace Badger.Redis.IO
 
         private async Task WriteSimpleAsync(IRedisType value, CancellationToken cancellationToken)
         {
-            var bytes = DefaultEncoding.GetBytes($"{value.DataType.Prefix()}{value}{NewLine}");
+            var bytes = DefaultEncoding.GetBytes($"{value.RedisType.Prefix()}{value}{NewLine}");
             await _stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
         }
 

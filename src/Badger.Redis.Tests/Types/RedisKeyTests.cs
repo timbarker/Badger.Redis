@@ -11,7 +11,7 @@ namespace Badger.Redis.Tests.Types
         {
             var key = new RedisKey("test");
 
-            Assert.Equal(RedisType.BulkString, key.DataType);
+            Assert.Equal(RedisType.BulkString, key.RedisType);
         }
 
         [Fact]

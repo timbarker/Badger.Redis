@@ -8,7 +8,7 @@ namespace Badger.Redis.Types
     internal class RedisArray : IRedisType<IRedisType[]>, IEnumerable<IRedisType>, IEquatable<RedisArray>
     {
         public static RedisArray Null = new RedisArray();
-        public RedisType DataType { get; } = RedisType.Array;
+        public RedisType RedisType { get; } = RedisType.Array;
         public IRedisType[] Value { get; }
         public int Length => Value?.Length ?? -1;
 

@@ -9,7 +9,7 @@ namespace Badger.Redis.Types
         private const int MaxSize = 512 * 1024 * 1024;
 
         public static RedisBulkString Null = new RedisBulkString();
-        public RedisType DataType { get; } = RedisType.BulkString;
+        public RedisType RedisType { get; } = RedisType.BulkString;
         public byte[] Value { get; }
         public int Length => Value?.Length ?? -1;
 

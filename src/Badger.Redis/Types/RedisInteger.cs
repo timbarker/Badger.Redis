@@ -4,7 +4,7 @@ namespace Badger.Redis.Types
 {
     internal class RedisInteger : IRedisType<long>, IEquatable<RedisInteger>
     {
-        public RedisType DataType { get; } = RedisType.Integer;
+        public RedisType RedisType { get; } = RedisType.Integer;
         public long Value { get; }
 
         public RedisInteger(long value)

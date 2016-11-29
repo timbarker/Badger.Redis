@@ -40,7 +40,7 @@ namespace Badger.Redis.Tests.Connection
             [Fact]
             public void ThenAPingMessageIsSent()
             {
-                _client.Verify(c => c.SendAsync(It.Is<IRedisType>(dt => dt.DataType == RedisType.Array &&
+                _client.Verify(c => c.SendAsync(It.Is<IRedisType>(dt => dt.RedisType == RedisType.Array &&
                                                                         (dt as RedisArray).Cast<RedisBulkString>().First() == RedisBulkString.FromString("PING", Encoding.ASCII)),
                                                 CancellationToken.None));
             }
@@ -80,7 +80,7 @@ namespace Badger.Redis.Tests.Connection
             [Fact]
             public void ThenAQuitMessageIsSent()
             {
-                _client.Verify(s => s.SendAsync(It.Is<IRedisType>(dt => dt.DataType == RedisType.Array &&
+                _client.Verify(s => s.SendAsync(It.Is<IRedisType>(dt => dt.RedisType == RedisType.Array &&
                                                                         (dt as RedisArray).Cast<RedisBulkString>().First() == RedisBulkString.FromString("QUIT", Encoding.ASCII)),
                                                 CancellationToken.None));
             }
@@ -110,7 +110,7 @@ namespace Badger.Redis.Tests.Connection
             [Fact]
             public void ThenAPingMessageIsSent()
             {
-                _client.Verify(c => c.SendAsync(It.Is<IRedisType>(dt => dt.DataType == RedisType.Array &&
+                _client.Verify(c => c.SendAsync(It.Is<IRedisType>(dt => dt.RedisType == RedisType.Array &&
                                                                         (dt as RedisArray).Cast<RedisBulkString>().First() == RedisBulkString.FromString("PING", Encoding.ASCII)),
                                                 CancellationToken.None));
             }

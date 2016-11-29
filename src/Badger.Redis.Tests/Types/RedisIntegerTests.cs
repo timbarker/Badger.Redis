@@ -10,7 +10,7 @@ namespace Badger.Redis.Tests.Types
         {
             var i = new RedisInteger(0);
 
-            Assert.Equal(RedisType.Integer, i.DataType);
+            Assert.Equal(RedisType.Integer, i.RedisType);
         }
 
         [Fact]

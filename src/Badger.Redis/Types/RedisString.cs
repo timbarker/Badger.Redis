@@ -4,7 +4,7 @@ namespace Badger.Redis.Types
 {
     internal class RedisString : IRedisType<string>, IEquatable<RedisString>
     {
-        public RedisType DataType { get; } = RedisType.String;
+        public RedisType RedisType { get; } = RedisType.String;
         public string Value { get; }
 
         public RedisString(string value)

@@ -4,7 +4,7 @@ namespace Badger.Redis.Types
 {
     internal class RedisErorr : IRedisType<string>, IEquatable<RedisErorr>
     {
-        public RedisType DataType { get; } = RedisType.Error;
+        public RedisType RedisType { get; } = RedisType.Error;
         public string Value { get; }
 
         public RedisErorr(string value)
