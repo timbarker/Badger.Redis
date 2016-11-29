@@ -4,6 +4,7 @@ using Badger.Redis.IO;
 using Moq;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,9 +58,9 @@ namespace Badger.Redis.Tests.Connection
                 _clientFactory = new Mock<IClientFactory>();
                 _client = new Mock<IClient>();
                 _client.Setup(s => s.SendAsync(new Array(BulkString.FromString("PING", Encoding.ASCII)), It.IsAny<CancellationToken>()))
-                       .Returns(Task.FromResult<IDataType>(new String("PONG")));
+                       .ReturnsAsync(new String("PONG"));
                 _client.Setup(s => s.SendAsync(new Array(BulkString.FromString("QUIT", Encoding.ASCII)), It.IsAny<CancellationToken>()))
-                        .Returns(Task.FromResult<IDataType>(new String("OK")));
+                        .ReturnsAsync(new String("OK"));
 
                 _clientFactory.SetReturnsDefault(Task.FromResult(_client.Object));
 
@@ -114,6 +115,52 @@ namespace Badger.Redis.Tests.Connection
                 _client.Verify(c => c.SendAsync(It.Is<IDataType>(dt => dt.DataType == DataType.Array &&
                                                                         (dt as Array).Cast<BulkString>().First() == BulkString.FromString("PING", Encoding.ASCII)),
                                                 CancellationToken.None));
+            }
+        }
+
+        public class WhenAnErrorOccursWhenSendingAPing
+        {
+            private ConnectionException _ex;
+            private BasicConnection _connection;
+            private Mock<IClient> _client;
+
+            public WhenAnErrorOccursWhenSendingAPing()
+            {
+                var clientFactory = new Mock<IClientFactory>();
+                _client = new Mock<IClient>();
+                _client
+                    .Setup(c => c.SendAsync(It.IsAny<IDataType>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(new String("PONG"));
+                clientFactory.SetReturnsDefault(Task.FromResult(_client.Object));
+
+                _connection = new BasicConnection(new IPEndPoint(IPAddress.Loopback, 6379), clientFactory.Object);
+
+                _connection.OpenAsync(CancellationToken.None).Wait();
+
+                _client.Reset();
+                _client
+                    .Setup(c => c.SendAsync(It.IsAny<IDataType>(), It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(new SocketException());
+
+                _ex = Assert.ThrowsAsync<ConnectionException>(() => _connection.PingAsync(CancellationToken.None)).Result;
+            }
+
+            [Fact]
+            public void ThenTheExceptionMessageIsCorrect()
+            {
+                Assert.Equal("Error while making request", _ex.Message);
+            }
+
+            [Fact]
+            public void ThenTheConnectionIsClosed()
+            {
+                Assert.Equal(ConnectionState.Closed, _connection.State);
+            }
+
+            [Fact]
+            public void ThenTheClientIsDisposed()
+            {
+                _client.Verify(c => c.Dispose());
             }
         }
     }

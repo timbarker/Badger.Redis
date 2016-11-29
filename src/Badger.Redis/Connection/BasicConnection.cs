@@ -1,6 +1,7 @@
 ﻿using Badger.Redis.Commands;
 using Badger.Redis.DataTypes;
 using Badger.Redis.IO;
+using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Badger.Redis.Connection
     {
         private IClientFactory _clientFactory;
 
-        private interface IState
+        private interface IState : IDisposable
         {
             ConnectionState State { get; }
         }
@@ -21,17 +22,30 @@ namespace Badger.Redis.Connection
         {
             public IPEndPoint EndPoint { get; set; }
             public ConnectionState State => ConnectionState.Disconnected;
+
+            public void Dispose()
+            {
+            }
         }
 
         private class Connected : IState
         {
             public IClient Client { get; set; }
             public ConnectionState State => ConnectionState.Connected;
+
+            public void Dispose()
+            {
+                Client.Dispose();
+            }
         }
 
         private class Closed : IState
         {
             public ConnectionState State => ConnectionState.Closed;
+
+            public void Dispose()
+            {
+            }
         }
 
         private IState _state;
@@ -57,7 +71,17 @@ namespace Badger.Redis.Connection
         {
             var state = GetState<Connected>();
 
-            var response = await state.Client.SendAsync(request, cancellationToken);
+            IDataType response;
+            try
+            {
+                response = await state.Client.SendAsync(request, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Close();
+                throw new ConnectionException("Error while making request", ex);
+            }
+
             if (response is T)
                 return (T)response;
 
@@ -92,14 +116,15 @@ namespace Badger.Redis.Connection
             return state;
         }
 
+        private void Close()
+        {
+            _state.Dispose();
+            _state = new Closed();
+        }
+
         public void Dispose()
         {
-            if (!(_state is Connected))
-                return;
-
-            var state = GetState<Connected>();
-            state.Client.Dispose();
-            _state = new Closed();
+            Close();
         }
     }
 }

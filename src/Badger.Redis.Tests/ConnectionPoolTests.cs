@@ -2,7 +2,6 @@
 using Moq;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Badger.Redis.Tests
@@ -46,10 +45,11 @@ namespace Badger.Redis.Tests
             public WhenReturningAConnectionToThePool()
             {
                 _connection = new Mock<IConnection>();
+                _connection.SetReturnsDefault(ConnectionState.Connected);
                 _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
                     .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult(_connection.Object));
+                    .ReturnsAsync(_connection.Object);
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
 
                 _connectionPool.GetConnectionAsync().Result.Dispose();
@@ -59,6 +59,44 @@ namespace Badger.Redis.Tests
             public void ThenTheConnectionIsNotDisposed()
             {
                 _connection.Verify(c => c.Dispose(), Times.Never());
+            }
+
+            [Fact]
+            public void ThenThePoolHasNoActiveConnections()
+            {
+                Assert.Equal(0, _connectionPool.ActiveConnections);
+            }
+        }
+
+        public class WhenReturningANonConnectedConnectionToThePool
+        {
+            private Mock<IConnectionCreator> _connectionFactory;
+            private Configuration _config = new Configuration();
+            private ConnectionPool _connectionPool;
+            private Mock<IConnection> _connection;
+
+            public WhenReturningANonConnectedConnectionToThePool()
+            {
+                _connection = new Mock<IConnection>();
+                _connectionFactory = new Mock<IConnectionCreator>();
+                _connectionFactory
+                    .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(_connection.Object);
+                _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
+
+                var poolConnection = _connectionPool.GetConnectionAsync().Result;
+
+                _connection
+                    .SetupGet(c => c.State)
+                    .Returns(ConnectionState.Closed);
+
+                poolConnection.Dispose();
+            }
+
+            [Fact]
+            public void ThenTheConnectionIsDisposed()
+            {
+                _connection.Verify(c => c.Dispose());
             }
 
             [Fact]
@@ -78,10 +116,11 @@ namespace Badger.Redis.Tests
             public WhenGettingAConnectionFromAnNonEmptyPool()
             {
                 _connection = new Mock<IConnection>();
+                _connection.SetReturnsDefault(ConnectionState.Connected);
                 _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
                             .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                            .Returns(Task.FromResult(_connection.Object));
+                            .ReturnsAsync(_connection.Object);
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Result.Dispose();
@@ -162,7 +201,7 @@ namespace Badger.Redis.Tests
                 _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
                             .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                            .Returns(Task.FromResult(_connection.Object));
+                            .ReturnsAsync(_connection.Object);
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Result.Dispose();
@@ -190,7 +229,7 @@ namespace Badger.Redis.Tests
                 _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
                             .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                            .Returns(Task.FromResult(_connection.Object));
+                            .ReturnsAsync(_connection.Object);
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Wait();
@@ -224,7 +263,7 @@ namespace Badger.Redis.Tests
                 _connectionFactory = new Mock<IConnectionCreator>();
                 _connectionFactory
                             .Setup(cf => cf.CreateOpenedAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                            .Returns(Task.FromResult(_connection.Object));
+                            .ReturnsAsync(_connection.Object);
 
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 var activeConnection = _connectionPool.GetConnectionAsync().Result;

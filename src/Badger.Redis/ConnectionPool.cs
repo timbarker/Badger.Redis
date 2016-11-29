@@ -117,7 +117,7 @@ namespace Badger.Redis
 
         private void Return(IConnection conn)
         {
-            if (!_disposed)
+            if (!_disposed && conn.State == ConnectionState.Connected)
             {
                 _availableConnections.Enqueue(conn);
             }
