@@ -125,7 +125,7 @@ namespace Badger.Redis.Tests
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Result.Dispose();
 
-                _connectionFactory.ResetCalls();
+                _connectionFactory.Invocations.Clear();
 
                 var connection = _connectionPool.GetConnectionAsync().Result;
             }
@@ -164,7 +164,7 @@ namespace Badger.Redis.Tests
                 _connectionPool = new ConnectionPool(_config, _connectionFactory.Object);
                 _connectionPool.GetConnectionAsync().Wait();
 
-                _connectionFactory.ResetCalls();
+                _connectionFactory.Invocations.Clear();
 
                 _exception = Assert.ThrowsAsync<ConnectionPoolException>(() => _connectionPool.GetConnectionAsync()).Result;
             }

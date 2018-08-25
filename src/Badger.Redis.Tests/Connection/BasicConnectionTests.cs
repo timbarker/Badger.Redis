@@ -66,7 +66,7 @@ namespace Badger.Redis.Tests.Connection
 
                 connection.OpenAsync(CancellationToken.None).Wait();
 
-                _client.ResetCalls();
+                _client.Invocations.Clear();
 
                 connection.DisconnectAsync(CancellationToken.None).Wait();
             }
@@ -102,7 +102,7 @@ namespace Badger.Redis.Tests.Connection
 
                 connection.OpenAsync(CancellationToken.None).Wait();
 
-                _client.ResetCalls();
+                _client.Invocations.Clear();
 
                 connection.PingAsync(CancellationToken.None).Wait();
             }

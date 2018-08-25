@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Badger.Redis.IntegrationTests
 {
-    public class ConnectionTesst
+    public class ConnectionTests
     {
         private static readonly Configuration Config = new Configuration { Host = "localhost", Port = 6379 };
 
