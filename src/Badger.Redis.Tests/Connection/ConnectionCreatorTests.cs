@@ -95,7 +95,7 @@ namespace Badger.Redis.Tests.Connection
             [Fact]
             public void ThenTheConnectionIsCreated()
             {
-                _connectionFactory.Verify(cf => cf.Create(It.Is<IPEndPoint>(ipe => ipe.Address.Equals(IPAddress.IPv6Loopback) && ipe.Port == 1234)));
+                _connectionFactory.Verify(cf => cf.Create(It.Is<IPEndPoint>(ipe => IPAddress.IsLoopback(ipe.Address) && ipe.Port == 1234)));
             }
 
             [Fact]
