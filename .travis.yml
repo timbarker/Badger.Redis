@@ -1,0 +1,10 @@
+language: csharp
+mono: none
+dotnet: 2.1.300
+dist: trusty
+services:
+  - redis
+script:
+  - dotnet build src/Badger.Redis.sln -c Release
+  - dotnet test src/Badger.Redis.Tests/Badger.Redis.Tests.csproj -c Release
+  - dotnet test src/Badger.Redis.IntegrationTests/Badger.Redis.IntegrationTests.csproj -c Release
