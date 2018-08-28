@@ -1,5 +1,8 @@
 # Badger.Redis
 
+[![Build Status](https://travis-ci.org/timbarker/Badger.Redis.svg?branch=master)](https://travis-ci.org/timbarker/Badger.Redis)
+
+
 ## Still in early development so don't use for anything that matters
 
 ### A simple .NET client for Redis
